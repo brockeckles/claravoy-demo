@@ -3330,6 +3330,72 @@
       }
     }
 
+    // ===== VISITOR ANALYTICS =====
+    (function() {
+      var analyticsSessionId = 'sess_' + Math.random().toString(36).substr(2, 12) + '_' + Date.now();
+      var sessionStart = Date.now();
+      var trackingSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      function trackEvent(eventType, tabName) {
+        var elapsed = Math.round((Date.now() - sessionStart) / 1000);
+        trackingSb.from('page_analytics').insert({
+          session_id: analyticsSessionId,
+          event_type: eventType,
+          tab_name: tabName || null,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent || null,
+          screen_width: window.innerWidth,
+          duration_seconds: elapsed
+        }).then(function() {});
+      }
+
+      // Track page load
+      window.addEventListener('load', function() {
+        trackEvent('page_load', 'overview');
+      });
+
+      // Track tab switches (hook into existing tab buttons)
+      document.querySelectorAll('.tab-button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          trackEvent('tab_view', this.getAttribute('data-tab'));
+        });
+      });
+
+      // Track session duration on exit
+      window.addEventListener('beforeunload', function() {
+        var elapsed = Math.round((Date.now() - sessionStart) / 1000);
+        var headers = {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Prefer': 'return=minimal'
+        };
+        var body = JSON.stringify({
+          session_id: analyticsSessionId,
+          event_type: 'session_end',
+          duration_seconds: elapsed,
+          screen_width: window.innerWidth
+        });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(
+            SUPABASE_URL + '/rest/v1/page_analytics',
+            new Blob([body], { type: 'application/json' })
+          );
+        }
+        // Fallback: also try fetch with keepalive
+        try {
+          fetch(SUPABASE_URL + '/rest/v1/page_analytics', {
+            method: 'POST', headers: headers, body: body, keepalive: true
+          });
+        } catch(e) {}
+      });
+
+      // Also send a heartbeat every 30 seconds so we can track active time
+      setInterval(function() {
+        trackEvent('heartbeat');
+      }, 30000);
+    })();
+
     // ===== INITIAL LOAD =====
     document.addEventListener('DOMContentLoaded', async function() {
       // Load all live data, then render default tab
