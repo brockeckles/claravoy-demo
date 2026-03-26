@@ -2578,10 +2578,10 @@
 
       // Platform bar breakdown
       const barsContainer = document.getElementById('hero-platform-bars');
+      var bestPlat = { name: '', score: -1 };
+      var worstPlat = { name: '', score: 101 };
       if (barsContainer) {
         let barsHtml = '';
-        let bestPlat = { name: '', score: -1 };
-        let worstPlat = { name: '', score: 101 };
         PLATFORMS.forEach(function(p) {
           const pScore = hyveeData[p.slug] || 0;
           const pClass = getScoreClass(pScore);
