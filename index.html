@@ -1364,6 +1364,7 @@
           <button class="nav-sub-btn" data-tab="visibility">Visibility Score</button>
           <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers</button>
           <button class="nav-sub-btn" data-tab="trends">Score Trends</button>
+          <button class="nav-sub-btn" data-tab="alerts">What Changed</button>
           <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
@@ -1807,6 +1808,28 @@
 
         <!-- Summary stats row -->
         <div id="trend-stats" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:16px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB: WHAT CHANGED (TREND ALERTS) -->
+    <div id="alerts" class="tab-content">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <h3 style="margin:0;">What Changed This Week</h3>
+          <div id="alerts-date-range" style="font-size:13px; color:#7A7570;"></div>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Auto-generated summary of score changes, key wins, and emerging trends across platforms and competitors.</p>
+
+        <!-- Summary headline card -->
+        <div id="alerts-headline" style="padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:24px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <svg width="22" height="22" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:1px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+            <div id="alerts-headline-text" style="font-size:15px; line-height:1.6; font-weight:500;"></div>
+          </div>
+        </div>
+
+        <!-- Alert feed -->
+        <div id="alerts-feed" style="display:grid; gap:12px;"></div>
       </div>
     </div>
 
@@ -4110,9 +4133,221 @@
       renderTrendChart();
     }
 
+    // ===== WHAT CHANGED (TREND ALERTS) TAB =====
+    var alertsInitialized = false;
+
+    function initAlertsTab() {
+      if (alertsInitialized) return;
+      alertsInitialized = true;
+
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'fareway': 'Fareway',
+        'aldi': 'ALDI', 'fresh-thyme': 'Fresh Thyme', 'kroger': 'Kroger',
+        'wegmans': 'Wegmans', 'schnucks': 'Schnucks'
+      };
+
+      var PLATFORM_NAMES = {
+        'chatgpt': 'ChatGPT', 'perplexity': 'Perplexity',
+        'google-ai': 'Google AI', 'meta-ai': 'Meta AI', 'alexa': 'Alexa'
+      };
+
+      // Determine date range for "this week"
+      var rawDates = window.TREND_RAW_DATES || [];
+      var last7 = rawDates.slice(-7);
+      var dateRangeEl = document.getElementById('alerts-date-range');
+      if (last7.length >= 2) {
+        var fmtDate = function(d) {
+          var dt = new Date(d + 'T00:00:00');
+          return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        };
+        dateRangeEl.textContent = fmtDate(last7[0]) + ' – ' + fmtDate(last7[last7.length - 1]);
+      }
+
+      var alerts = [];
+
+      // === 1. Hy-Vee composite change (7-day) ===
+      var hvComposites = COMPETITOR_DAILY_COMPOSITES['hy-vee'] || [];
+      var hvRecent = hvComposites.slice(-7).filter(function(v) { return v !== null; });
+      var hvChange = 0;
+      var hvCurrent = 0;
+      var hvPrev = 0;
+      if (hvRecent.length >= 2) {
+        hvCurrent = hvRecent[hvRecent.length - 1];
+        hvPrev = hvRecent[0];
+        hvChange = hvCurrent - hvPrev;
+      }
+
+      if (hvChange > 0) {
+        alerts.push({
+          type: 'positive',
+          icon: '↑',
+          title: 'Composite Score Rising',
+          body: 'Hy-Vee\'s composite visibility score increased <strong>' + hvChange + ' points</strong> this week (from ' + hvPrev + ' to ' + hvCurrent + '). Momentum is building across platforms.'
+        });
+      } else if (hvChange < 0) {
+        alerts.push({
+          type: 'negative',
+          icon: '↓',
+          title: 'Composite Score Declined',
+          body: 'Hy-Vee\'s composite visibility score dropped <strong>' + Math.abs(hvChange) + ' points</strong> this week (from ' + hvPrev + ' to ' + hvCurrent + '). Review platform-level changes below.'
+        });
+      } else if (hvRecent.length >= 2) {
+        alerts.push({
+          type: 'neutral',
+          icon: '→',
+          title: 'Composite Score Steady',
+          body: 'Hy-Vee\'s composite visibility score held at <strong>' + hvCurrent + '</strong> this week. Scores stable across platforms.'
+        });
+      }
+
+      // === 2. Per-platform changes for Hy-Vee ===
+      var platformChanges = [];
+      Object.keys(PLATFORM_NAMES).forEach(function(pSlug) {
+        var scores = (HYVEE_DAILY_SCORES[pSlug] || []).slice(-7).filter(function(v) { return v !== null; });
+        if (scores.length >= 2) {
+          var change = scores[scores.length - 1] - scores[0];
+          platformChanges.push({ slug: pSlug, name: PLATFORM_NAMES[pSlug], change: change, current: scores[scores.length - 1] });
+        }
+      });
+
+      // Biggest gainer
+      platformChanges.sort(function(a, b) { return b.change - a.change; });
+      if (platformChanges.length > 0 && platformChanges[0].change > 0) {
+        var best = platformChanges[0];
+        alerts.push({
+          type: 'positive',
+          icon: '★',
+          title: 'Best Platform: ' + best.name + ' (+' + best.change + ')',
+          body: best.name + ' saw the largest score improvement this week, climbing <strong>' + best.change + ' points</strong> to reach ' + best.current + '. This platform is responding well to current content and data strategies.'
+        });
+      }
+
+      // Biggest decliner
+      platformChanges.sort(function(a, b) { return a.change - b.change; });
+      if (platformChanges.length > 0 && platformChanges[0].change < 0) {
+        var worst = platformChanges[0];
+        alerts.push({
+          type: 'negative',
+          icon: '⚠',
+          title: 'Declining Platform: ' + worst.name + ' (' + worst.change + ')',
+          body: worst.name + ' dropped <strong>' + Math.abs(worst.change) + ' points</strong> this week (now at ' + worst.current + '). Investigate whether content freshness, schema changes, or platform algorithm updates may be responsible.'
+        });
+      }
+
+      // === 3. Competitor movements ===
+      var compChanges = [];
+      Object.keys(COMPETITOR_DAILY_COMPOSITES).forEach(function(slug) {
+        if (slug === 'hy-vee') return;
+        var comps = COMPETITOR_DAILY_COMPOSITES[slug] || [];
+        var recent = comps.slice(-7).filter(function(v) { return v !== null; });
+        if (recent.length >= 2) {
+          compChanges.push({
+            slug: slug,
+            name: GROCER_NAMES[slug] || slug,
+            change: recent[recent.length - 1] - recent[0],
+            current: recent[recent.length - 1]
+          });
+        }
+      });
+
+      // Fastest rising competitor
+      compChanges.sort(function(a, b) { return b.change - a.change; });
+      if (compChanges.length > 0 && compChanges[0].change > 2) {
+        var rising = compChanges[0];
+        alerts.push({
+          type: 'warning',
+          icon: '⚡',
+          title: 'Competitor Rising: ' + rising.name + ' (+' + rising.change + ')',
+          body: rising.name + ' gained <strong>' + rising.change + ' points</strong> this week (now at ' + rising.current + '). ' +
+            (rising.current > hvCurrent ? 'They now lead Hy-Vee by ' + (rising.current - hvCurrent) + ' points.' : 'Hy-Vee still leads by ' + (hvCurrent - rising.current) + ' points.')
+        });
+      }
+
+      // Competitor gaining ground on Hy-Vee
+      var closingGap = compChanges.filter(function(c) { return c.change > hvChange && c.current < hvCurrent; });
+      closingGap.sort(function(a, b) { return (b.change - hvChange) - (a.change - hvChange); });
+      if (closingGap.length > 0) {
+        var closer = closingGap[0];
+        var gapNow = hvCurrent - closer.current;
+        alerts.push({
+          type: 'warning',
+          icon: '🔍',
+          title: closer.name + ' Closing the Gap',
+          body: closer.name + ' grew faster than Hy-Vee this week (+' + closer.change + ' vs +' + hvChange + '). The gap narrowed to <strong>' + gapNow + ' points</strong>. Monitor closely to maintain competitive advantage.'
+        });
+      }
+
+      // === 4. Platform coverage check ===
+      var weakPlatforms = platformChanges.filter(function(p) { return p.current < 30; });
+      if (weakPlatforms.length > 0) {
+        var weakNames = weakPlatforms.map(function(p) { return p.name + ' (' + p.current + ')'; }).join(', ');
+        alerts.push({
+          type: 'negative',
+          icon: '🚫',
+          title: 'Low Visibility Platforms',
+          body: 'Hy-Vee scores below 30 on: <strong>' + weakNames + '</strong>. These represent significant blind spots where consumers using these platforms are unlikely to see Hy-Vee recommendations.'
+        });
+      }
+
+      // === 5. Strength highlight ===
+      var strongPlatforms = platformChanges.filter(function(p) { return p.current >= 70; });
+      if (strongPlatforms.length > 0) {
+        var strongNames = strongPlatforms.map(function(p) { return p.name + ' (' + p.current + ')'; }).join(', ');
+        alerts.push({
+          type: 'positive',
+          icon: '✓',
+          title: 'Strong Platform Presence',
+          body: 'Hy-Vee maintains strong visibility (70+) on: <strong>' + strongNames + '</strong>. Continue current strategies on these platforms to maintain position.'
+        });
+      }
+
+      // === 6. Week-over-week trend direction ===
+      var trendingUp = platformChanges.filter(function(p) { return p.change > 0; }).length;
+      var trendingDown = platformChanges.filter(function(p) { return p.change < 0; }).length;
+      if (trendingUp > 0 || trendingDown > 0) {
+        alerts.push({
+          type: trendingUp >= trendingDown ? 'neutral' : 'warning',
+          icon: '📊',
+          title: 'Platform Trend Summary',
+          body: 'This week: <strong>' + trendingUp + ' platform' + (trendingUp !== 1 ? 's' : '') + ' trending up</strong>, ' +
+            trendingDown + ' trending down, ' + (platformChanges.length - trendingUp - trendingDown) + ' stable. ' +
+            (trendingUp > trendingDown ? 'Overall momentum is positive.' : trendingDown > trendingUp ? 'Overall momentum needs attention.' : 'Mixed signals across platforms.')
+        });
+      }
+
+      // === Render headline ===
+      var headlineEl = document.getElementById('alerts-headline-text');
+      if (hvChange > 0) {
+        headlineEl.innerHTML = 'Good week for Hy-Vee — composite score up <strong>' + hvChange + ' points</strong> to ' + hvCurrent + '. ' + trendingUp + ' of 5 platforms showing improvement.';
+      } else if (hvChange < 0) {
+        headlineEl.innerHTML = 'Attention needed — composite score down <strong>' + Math.abs(hvChange) + ' points</strong> to ' + hvCurrent + '. Review the alerts below for details.';
+      } else {
+        headlineEl.innerHTML = 'Holding steady at <strong>' + hvCurrent + '</strong> composite score. ' + trendingUp + ' platform' + (trendingUp !== 1 ? 's' : '') + ' showing gains this week.';
+      }
+
+      // === Render alert cards ===
+      var feedContainer = document.getElementById('alerts-feed');
+      var typeStyles = {
+        positive: { bg: '#2D8A6E12', border: '#2D8A6E', iconBg: '#2D8A6E', iconColor: '#fff' },
+        negative: { bg: '#C0392B10', border: '#C0392B', iconBg: '#C0392B', iconColor: '#fff' },
+        warning: { bg: '#D4782F10', border: '#D4782F', iconBg: '#D4782F', iconColor: '#fff' },
+        neutral: { bg: '#F5F2EE', border: '#D0CBC4', iconBg: '#7A7570', iconColor: '#fff' }
+      };
+
+      feedContainer.innerHTML = alerts.map(function(alert) {
+        var s = typeStyles[alert.type] || typeStyles.neutral;
+        return '<div style="display:flex; gap:14px; padding:16px 18px; background:' + s.bg + '; border-left:3px solid ' + s.border + '; border-radius:8px;">' +
+          '<div style="width:32px; height:32px; border-radius:8px; background:' + s.iconBg + '; color:' + s.iconColor + '; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">' + alert.icon + '</div>' +
+          '<div>' +
+          '<div style="font-size:14px; font-weight:600; color:#1A2740; margin-bottom:4px;">' + alert.title + '</div>' +
+          '<div style="font-size:13px; color:#5A5550; line-height:1.6;">' + alert.body + '</div>' +
+          '</div></div>';
+      }).join('');
+    }
+
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'drivers', 'trends', 'platforms', 'competitive', 'queries'],
+      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries'],
       act: ['recommendations', 'simulator', 'roi'],
       admin: ['storemap', 'pipeline']
     };
@@ -4135,6 +4370,7 @@
       else if (tabName === 'simulator') initSimulatorTab();
       else if (tabName === 'drivers') initDriversTab();
       else if (tabName === 'trends') initTrendsTab();
+      else if (tabName === 'alerts') initAlertsTab();
     }
 
     function activateGroup(groupName) {
