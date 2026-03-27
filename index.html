@@ -1291,6 +1291,8 @@
       <button class="tab-button" data-tab="queries">Query Intelligence</button>
       <button class="tab-button" data-tab="storemap">Store Map</button>
       <button class="tab-button" data-tab="recommendations">Recommendations</button>
+      <button class="tab-button" data-tab="simulator">AI Simulator</button>
+      <button class="tab-button" data-tab="roi">ROI Calculator</button>
       <button class="tab-button" data-tab="pipeline">Pipeline Status</button>
     </div>
 
@@ -1724,6 +1726,107 @@
 
       <!-- Recommendations List -->
       <div id="rec-cards-container"></div>
+    </div>
+
+    <!-- TAB: AI RESPONSE SIMULATOR -->
+    <div id="simulator" class="tab-content">
+      <div class="card">
+        <div class="card-title">AI Response Simulator</div>
+        <p class="text-secondary" style="margin-bottom: 16px;">See how AI platforms respond to grocery-related queries in your markets. Type a query or select a sample to see how each platform mentions (or misses) your brand.</p>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="sim-query-input" placeholder="e.g., best grocery store in Des Moines" style="flex: 1; min-width: 280px; padding: 12px 16px; border: 1px solid #D0CBC4; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; color: #1A2740;">
+          <button id="sim-run-btn" style="padding: 12px 24px; background: #1A2740; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;">Simulate</button>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="text-secondary" style="font-size: 12px; line-height: 28px;">Try:</span>
+          <button class="sim-sample-btn" style="padding: 4px 12px; background: #f0ece7; border: 1px solid #D0CBC4; border-radius: 16px; font-size: 12px; cursor: pointer; color: #1A2740; font-family: inherit;">best grocery store in Des Moines</button>
+          <button class="sim-sample-btn" style="padding: 4px 12px; background: #f0ece7; border: 1px solid #D0CBC4; border-radius: 16px; font-size: 12px; cursor: pointer; color: #1A2740; font-family: inherit;">grocery delivery Iowa</button>
+          <button class="sim-sample-btn" style="padding: 4px 12px; background: #f0ece7; border: 1px solid #D0CBC4; border-radius: 16px; font-size: 12px; cursor: pointer; color: #1A2740; font-family: inherit;">organic grocery near me Midwest</button>
+          <button class="sim-sample-btn" style="padding: 4px 12px; background: #f0ece7; border: 1px solid #D0CBC4; border-radius: 16px; font-size: 12px; cursor: pointer; color: #1A2740; font-family: inherit;">best meat department Iowa</button>
+          <button class="sim-sample-btn" style="padding: 4px 12px; background: #f0ece7; border: 1px solid #D0CBC4; border-radius: 16px; font-size: 12px; cursor: pointer; color: #1A2740; font-family: inherit;">cheapest groceries Des Moines</button>
+        </div>
+      </div>
+      <div id="sim-results" style="display: none;">
+        <div id="sim-loading" style="text-align: center; padding: 40px; color: #7A7570;">
+          <div style="font-size: 24px; margin-bottom: 12px;">Querying AI platforms...</div>
+          <div class="text-secondary">Simulating responses from 5 platforms</div>
+        </div>
+        <div id="sim-cards-container"></div>
+        <div class="card" id="sim-summary-card" style="display: none; margin-top: 16px;">
+          <div class="card-title">Visibility Summary</div>
+          <div id="sim-summary-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ROI CALCULATOR -->
+    <div id="roi" class="tab-content">
+      <div class="card">
+        <div class="card-title">Revenue Impact Calculator</div>
+        <p class="text-secondary" style="margin-bottom: 24px;">Estimate the revenue impact of improving your AI visibility score. Adjust the inputs below to model the opportunity in your markets.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Monthly AI-Assisted Grocery Searches in Market</label>
+            <input type="range" id="roi-searches" min="10000" max="500000" step="10000" value="150000" style="width: 100%; accent-color: #2D8A6E;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>10K</span><span id="roi-searches-val" style="font-weight: 600; color: #1A2740;">150,000</span><span>500K</span></div>
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Average Basket Size ($)</label>
+            <input type="range" id="roi-basket" min="20" max="200" step="5" value="85" style="width: 100%; accent-color: #2D8A6E;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>$20</span><span id="roi-basket-val" style="font-weight: 600; color: #1A2740;">$85</span><span>$200</span></div>
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Current Visibility Score</label>
+            <input type="range" id="roi-current" min="0" max="100" step="1" value="59" style="width: 100%; accent-color: #D4782F;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>0</span><span id="roi-current-val" style="font-weight: 600; color: #D4782F;">59</span><span>100</span></div>
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Target Visibility Score</label>
+            <input type="range" id="roi-target" min="0" max="100" step="1" value="80" style="width: 100%; accent-color: #2D8A6E;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>0</span><span id="roi-target-val" style="font-weight: 600; color: #2D8A6E;">80</span><span>100</span></div>
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Click-Through Rate from AI Recommendation (%)</label>
+            <input type="range" id="roi-ctr" min="1" max="25" step="0.5" value="8" style="width: 100%; accent-color: #5B4A9E;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>1%</span><span id="roi-ctr-val" style="font-weight: 600; color: #5B4A9E;">8%</span><span>25%</span></div>
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #1A2740; display: block; margin-bottom: 6px;">Conversion Rate (%)</label>
+            <input type="range" id="roi-conv" min="1" max="20" step="0.5" value="5" style="width: 100%; accent-color: #5B4A9E;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #7A7570;"><span>1%</span><span id="roi-conv-val" style="font-weight: 600; color: #5B4A9E;">5%</span><span>20%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px;">
+        <div class="card" style="text-align: center;">
+          <div class="text-secondary" style="font-size: 13px; margin-bottom: 8px;">Current Monthly Revenue from AI</div>
+          <div id="roi-current-rev" style="font-size: 32px; font-weight: 700; color: #D4782F;">—</div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="text-secondary" style="font-size: 13px; margin-bottom: 8px;">Projected Monthly Revenue from AI</div>
+          <div id="roi-target-rev" style="font-size: 32px; font-weight: 700; color: #2D8A6E;">—</div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="text-secondary" style="font-size: 13px; margin-bottom: 8px;">Monthly Revenue Uplift</div>
+          <div id="roi-uplift" style="font-size: 32px; font-weight: 700; color: #2D8A6E;">—</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+        <div class="card" style="text-align: center;">
+          <div class="text-secondary" style="font-size: 13px; margin-bottom: 8px;">Annual Revenue Uplift</div>
+          <div id="roi-annual" style="font-size: 36px; font-weight: 700; color: #1A2740;">—</div>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="text-secondary" style="font-size: 13px; margin-bottom: 8px;">ROI on Claravoy Professional ($3,000/mo)</div>
+          <div id="roi-return" style="font-size: 36px; font-weight: 700; color: #2D8A6E;">—</div>
+        </div>
+      </div>
+
+      <div class="insight-box" style="margin-top: 16px;">
+        <strong>Key Takeaway:</strong> <span id="roi-insight">Adjust the sliders above to see the projected revenue impact.</span>
+      </div>
     </div>
 
     <!-- TAB 5: PIPELINE STATUS -->
@@ -3044,6 +3147,256 @@
       container.innerHTML = html;
     }
 
+    // ===== ROI CALCULATOR =====
+    var roiInitialized = false;
+    function initROITab() {
+      if (roiInitialized) return;
+      roiInitialized = true;
+
+      var searches = document.getElementById('roi-searches');
+      var basket = document.getElementById('roi-basket');
+      var current = document.getElementById('roi-current');
+      var target = document.getElementById('roi-target');
+      var ctr = document.getElementById('roi-ctr');
+      var conv = document.getElementById('roi-conv');
+
+      // Set current score from live data
+      var liveComposite = (COMPETITOR_LATEST['hy-vee'] || {}).composite || 59;
+      current.value = liveComposite;
+      document.getElementById('roi-current-val').textContent = liveComposite;
+
+      function formatMoney(n) {
+        if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+        if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+        return '$' + Math.round(n);
+      }
+
+      function calcROI() {
+        var s = parseInt(searches.value);
+        var b = parseInt(basket.value);
+        var c = parseInt(current.value);
+        var t = parseInt(target.value);
+        var ct = parseFloat(ctr.value) / 100;
+        var cv = parseFloat(conv.value) / 100;
+
+        document.getElementById('roi-searches-val').textContent = s.toLocaleString();
+        document.getElementById('roi-basket-val').textContent = '$' + b;
+        document.getElementById('roi-current-val').textContent = c;
+        document.getElementById('roi-target-val').textContent = t;
+        document.getElementById('roi-ctr-val').textContent = ctr.value + '%';
+        document.getElementById('roi-conv-val').textContent = conv.value + '%';
+
+        // Visibility score maps to share of AI recommendations
+        // Higher score = more likely to be recommended = more traffic
+        var currentShare = (c / 100) * ct;
+        var targetShare = (t / 100) * ct;
+
+        var currentRev = s * currentShare * cv * b;
+        var targetRev = s * targetShare * cv * b;
+        var uplift = targetRev - currentRev;
+        var annual = uplift * 12;
+        var roiPct = annual > 0 ? Math.round((annual / 36000) * 100) : 0;
+
+        document.getElementById('roi-current-rev').textContent = formatMoney(currentRev);
+        document.getElementById('roi-current-rev').style.color = '#D4782F';
+        document.getElementById('roi-target-rev').textContent = formatMoney(targetRev);
+        document.getElementById('roi-uplift').textContent = '+' + formatMoney(uplift);
+        document.getElementById('roi-annual').textContent = '+' + formatMoney(annual);
+        document.getElementById('roi-return').textContent = roiPct + '%';
+        document.getElementById('roi-return').style.color = roiPct > 100 ? '#2D8A6E' : '#D4782F';
+
+        var insight = document.getElementById('roi-insight');
+        if (t <= c) {
+          insight.textContent = 'Set a target score higher than the current score to see the revenue opportunity.';
+        } else {
+          insight.textContent = 'Improving Hy-Vee\'s AI visibility from ' + c + ' to ' + t + ' could generate an additional ' + formatMoney(annual) + ' in annual revenue — a ' + roiPct + '% return on the Claravoy Professional subscription. Each point of visibility improvement is worth approximately ' + formatMoney(annual / (t - c)) + '/year.';
+        }
+      }
+
+      [searches, basket, current, target, ctr, conv].forEach(function(el) {
+        el.addEventListener('input', calcROI);
+      });
+
+      calcROI();
+    }
+
+    // ===== AI RESPONSE SIMULATOR =====
+    var simInitialized = false;
+    function initSimulatorTab() {
+      if (simInitialized) return;
+      simInitialized = true;
+
+      var input = document.getElementById('sim-query-input');
+      var btn = document.getElementById('sim-run-btn');
+      var results = document.getElementById('sim-results');
+      var loading = document.getElementById('sim-loading');
+      var cardsContainer = document.getElementById('sim-cards-container');
+      var summaryCard = document.getElementById('sim-summary-card');
+      var summaryContent = document.getElementById('sim-summary-content');
+
+      // Sample buttons
+      document.querySelectorAll('.sim-sample-btn').forEach(function(b) {
+        b.addEventListener('click', function() {
+          input.value = this.textContent;
+          runSimulation();
+        });
+      });
+
+      btn.addEventListener('click', runSimulation);
+      input.addEventListener('keydown', function(e) { if (e.key === 'Enter') runSimulation(); });
+
+      function runSimulation() {
+        var query = input.value.trim();
+        if (!query) return;
+
+        results.style.display = 'block';
+        loading.style.display = 'block';
+        cardsContainer.innerHTML = '';
+        summaryCard.style.display = 'none';
+
+        // Simulate a delay for realism
+        setTimeout(function() {
+          loading.style.display = 'none';
+          renderSimResults(query);
+        }, 1500);
+      }
+
+      function renderSimResults(query) {
+        // Find matching mentions from RECENT_MENTIONS
+        var queryLower = query.toLowerCase();
+        var platformResults = {};
+
+        PLATFORMS.forEach(function(p) {
+          var mentions = RECENT_MENTIONS[p.slug] || [];
+          // Find mentions that match the query (fuzzy match on keywords)
+          var queryWords = queryLower.split(/\s+/).filter(function(w) { return w.length > 2; });
+          var matched = mentions.filter(function(m) {
+            var mQuery = (m.query || '').toLowerCase();
+            return queryWords.some(function(w) { return mQuery.indexOf(w) > -1; });
+          });
+
+          // If no direct match, pick mentions from same category
+          if (matched.length === 0) {
+            matched = mentions.slice(0, 3);
+          }
+
+          // Build simulated response
+          var hyveeFound = false;
+          var hyveeRank = null;
+          var hyveeType = null;
+          var competitors = [];
+
+          matched.forEach(function(m) {
+            if (m.grocer === 'Hy-Vee') {
+              hyveeFound = true;
+              if (!hyveeRank || m.rank < hyveeRank) {
+                hyveeRank = m.rank;
+                hyveeType = m.type;
+              }
+            } else {
+              if (competitors.indexOf(m.grocer) === -1 && competitors.length < 3) {
+                competitors.push(m.grocer);
+              }
+            }
+          });
+
+          // Get platform score
+          var pScores = HYVEE_DAILY_SCORES[p.slug] || [];
+          var latestScore = 0;
+          for (var i = pScores.length - 1; i >= 0; i--) {
+            if (pScores[i] !== null && pScores[i] !== undefined) { latestScore = pScores[i]; break; }
+          }
+
+          platformResults[p.slug] = {
+            platform: p,
+            score: latestScore,
+            hyveeFound: hyveeFound,
+            hyveeRank: hyveeRank,
+            hyveeType: hyveeType,
+            competitors: competitors,
+            matchedMentions: matched
+          };
+        });
+
+        // Render cards
+        var html = '<div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px;">';
+
+        PLATFORMS.forEach(function(p) {
+          var r = platformResults[p.slug];
+          var scoreClass = getScoreClass(r.score);
+          var scoreColor = scoreClass === 'green' ? '#2D8A6E' : scoreClass === 'amber' ? '#D4782F' : '#C0392B';
+
+          var statusIcon, statusText, statusColor;
+          if (r.hyveeFound && r.hyveeRank === 1) {
+            statusIcon = '✓';
+            statusText = 'Primary Recommendation';
+            statusColor = '#2D8A6E';
+          } else if (r.hyveeFound) {
+            statusIcon = '~';
+            statusText = r.hyveeType === 'alternative_option' ? 'Listed as Alternative' : 'Mentioned (Rank ' + r.hyveeRank + ')';
+            statusColor = '#D4782F';
+          } else {
+            statusIcon = '✗';
+            statusText = 'Not Mentioned';
+            statusColor = '#C0392B';
+          }
+
+          // Generate simulated response text
+          var responseText = '';
+          if (r.hyveeFound && r.hyveeRank === 1) {
+            var strengths = (r.matchedMentions.find(function(m) { return m.grocer === 'Hy-Vee'; }) || {}).strengths || [];
+            responseText = '"For <strong>' + query + '</strong>, I\'d recommend <strong>Hy-Vee</strong>' + (strengths.length > 0 ? ' — known for ' + strengths.slice(0, 2).join(' and ') : '') + '.' + (r.competitors.length > 0 ? ' Other options include ' + r.competitors.join(', ') + '.' : '') + '"';
+          } else if (r.hyveeFound) {
+            responseText = '"Top picks for <strong>' + query + '</strong> include ' + (r.competitors.length > 0 ? r.competitors[0] : 'other grocers') + '. <strong>Hy-Vee</strong> is also worth considering as an alternative."';
+          } else {
+            responseText = '"For <strong>' + query + '</strong>, I\'d suggest ' + (r.competitors.length > 0 ? r.competitors.join(' or ') : 'checking local options') + '."';
+          }
+
+          html += '<div class="card" style="border-left: 4px solid ' + p.color + ';">';
+          html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
+          html += '<div style="display: flex; align-items: center; gap: 10px;">';
+          html += '<div style="width: 10px; height: 10px; border-radius: 50%; background: ' + p.color + ';"></div>';
+          html += '<strong style="font-size: 15px;">' + p.name + '</strong>';
+          html += '</div>';
+          html += '<div style="display: flex; align-items: center; gap: 12px;">';
+          html += '<span style="font-size: 13px; color: ' + statusColor + '; font-weight: 600;">' + statusIcon + ' ' + statusText + '</span>';
+          html += '<span style="background: ' + scoreColor + '22; color: ' + scoreColor + '; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;">Score: ' + r.score + '</span>';
+          html += '</div></div>';
+          html += '<div style="background: #f8f6f3; border-radius: 8px; padding: 14px; font-size: 13px; line-height: 1.6; color: #444; font-style: italic;">' + responseText + '</div>';
+          html += '</div>';
+        });
+
+        html += '</div>';
+        cardsContainer.innerHTML = html;
+
+        // Summary card
+        var found = 0, primary = 0, missed = 0;
+        PLATFORMS.forEach(function(p) {
+          var r = platformResults[p.slug];
+          if (r.hyveeFound) { found++; if (r.hyveeRank === 1) primary++; }
+          else missed++;
+        });
+
+        summaryCard.style.display = 'block';
+        var summaryHtml = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; margin-top: 12px;">';
+        summaryHtml += '<div><div style="font-size: 28px; font-weight: 700; color: #2D8A6E;">' + primary + '</div><div class="text-secondary" style="font-size: 12px;">Primary Recommendation</div></div>';
+        summaryHtml += '<div><div style="font-size: 28px; font-weight: 700; color: #D4782F;">' + (found - primary) + '</div><div class="text-secondary" style="font-size: 12px;">Mentioned (Not Primary)</div></div>';
+        summaryHtml += '<div><div style="font-size: 28px; font-weight: 700; color: #C0392B;">' + missed + '</div><div class="text-secondary" style="font-size: 12px;">Not Mentioned</div></div>';
+        summaryHtml += '</div>';
+
+        if (missed > 0) {
+          var missedPlatforms = [];
+          PLATFORMS.forEach(function(p) { if (!platformResults[p.slug].hyveeFound) missedPlatforms.push(p.name); });
+          summaryHtml += '<div style="margin-top: 16px; padding: 12px; background: #C0392B11; border-radius: 8px; font-size: 13px; color: #C0392B;"><strong>Visibility Gap:</strong> Hy-Vee is not appearing on ' + missedPlatforms.join(', ') + ' for this query. This represents a direct revenue loss as consumers are directed to competitors.</div>';
+        }
+        if (primary >= 3) {
+          summaryHtml += '<div style="margin-top: 12px; padding: 12px; background: #2D8A6E11; border-radius: 8px; font-size: 13px; color: #2D8A6E;"><strong>Strong Position:</strong> Hy-Vee is the primary recommendation on ' + primary + ' of 5 platforms for this query.</div>';
+        }
+
+        summaryContent.innerHTML = summaryHtml;
+      }
+    }
+
     // ===== EVENT HANDLERS =====
     document.querySelectorAll('.tab-button').forEach(button => {
       button.addEventListener('click', function() {
@@ -3068,6 +3421,8 @@
         else if (tabName === 'storemap') initStoreMapTab();
         else if (tabName === 'recommendations') initRecommendationsTab();
         else if (tabName === 'pipeline') initPipelineTab();
+        else if (tabName === 'roi') initROITab();
+        else if (tabName === 'simulator') initSimulatorTab();
       });
     });
 
