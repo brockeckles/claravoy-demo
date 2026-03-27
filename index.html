@@ -4542,12 +4542,16 @@
         var queryMeta = {}; // queryText → { market, text }
         var allMarkets = {};
 
+        // Markets to exclude from Query Gaps analysis
+        var EXCLUDED_MARKETS = { 'Rochester, NY': true };
+
         mentions.forEach(function(m) {
           var gSlug = grocerMap[m.grocer_id] || (m.grocers && m.grocers.slug);
           var pSlug = platformMap[m.platform_id] || (m.ai_platforms && m.ai_platforms.slug);
           var qText = m.query_library && m.query_library.query_text;
           var market = m.query_library && m.query_library.target_market;
           if (!gSlug || !pSlug || !qText) return;
+          if (market && EXCLUDED_MARKETS[market]) return;
 
           var key = qText + '|' + pSlug;
           if (!queryPlatformMap[key]) queryPlatformMap[key] = {};
