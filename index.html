@@ -1447,9 +1447,9 @@
           <button class="nav-sub-btn" data-tab="querygap">Query Gaps <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="simulator">AI Simulator <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="roi">ROI Calculator <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
         </div>
         <div class="nav-sub-group" data-group="admin">
-          <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
           <button class="nav-sub-btn" data-tab="pipeline">Pipeline Status</button>
         </div>
       </div>
@@ -4741,8 +4741,8 @@
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
       monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries'],
-      act: ['recommendations', 'querygap', 'simulator', 'roi'],
-      admin: ['storemap', 'pipeline']
+      act: ['recommendations', 'querygap', 'simulator', 'roi', 'storemap'],
+      admin: ['pipeline']
     };
 
     function switchToTab(tabName) {
