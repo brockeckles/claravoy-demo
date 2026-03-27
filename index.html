@@ -3564,84 +3564,58 @@
       if (driversInitialized) return;
       driversInitialized = true;
 
-      // Build driver scores from live data
-      // GROCER_SCORES format: { 'hy-vee': { platforms: { chatgpt: {score, mentions, ...}, ... }, composite: N }, ... }
-      var grocerDrivers = {};
-      var grocerNames = {};
+      // Display name lookup
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'fareway': 'Fareway',
+        'aldi': 'ALDI', 'fresh-thyme': 'Fresh Thyme', 'kroger': 'Kroger',
+        'wegmans': 'Wegmans', 'schnucks': 'Schnucks'
+      };
 
-      // Process COMPETITOR_LATEST (already loaded from Supabase)
+      // COMPETITOR_LATEST is flat: { 'hy-vee': { composite: 59, chatgpt: 87, perplexity: 61, 'google-ai': 46, 'meta-ai': 72, alexa: 28 }, ... }
+      var grocerDrivers = {};
+      var platformKeys = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai', 'alexa'];
+
       Object.keys(COMPETITOR_LATEST).forEach(function(slug) {
         var data = COMPETITOR_LATEST[slug];
-        grocerNames[slug] = data.name || slug;
-        var platforms = data.platforms || {};
-        var totalMentions = 0;
-        var totalPrimary = 0;
-        var totalScore = 0;
-        var platformCount = 0;
-        var sentimentPositive = 0;
-        var sentimentTotal = 0;
-        var hasAlexa = false;
-        var hasMeta = false;
-        var platformCoverage = 0;
-        var avgPosition = 0;
-        var positionCount = 0;
+        var composite = data.composite || 0;
 
-        Object.keys(platforms).forEach(function(pSlug) {
-          var p = platforms[pSlug];
-          var score = p.score || 0;
-          totalScore += score;
-          platformCount++;
-          if (score > 0) platformCoverage++;
-          totalMentions += (p.mentions || 0);
-          totalPrimary += (p.primary || 0);
-          if (p.sentiment_positive !== undefined) {
-            sentimentPositive += (p.sentiment_positive || 0);
-            sentimentTotal += (p.sentiment_positive || 0) + (p.sentiment_neutral || 0) + (p.sentiment_negative || 0);
-          }
-          if (p.avg_position && p.avg_position > 0) {
-            avgPosition += p.avg_position;
-            positionCount++;
-          }
-          if (pSlug === 'alexa' || pSlug === 'alexa-shopping') hasAlexa = true;
-          if (pSlug === 'meta-ai') hasMeta = true;
-        });
+        // Read platform scores directly from the flat structure
+        var chatgptScore = data['chatgpt'] || 0;
+        var perplexityScore = data['perplexity'] || 0;
+        var googleScore = data['google-ai'] || 0;
+        var metaScore = data['meta-ai'] || 0;
+        var alexaScore = data['alexa'] || 0;
 
-        var composite = data.composite || (platformCount > 0 ? Math.round(totalScore / platformCount) : 0);
-        var avgPos = positionCount > 0 ? avgPosition / positionCount : 3;
-        var sentPct = sentimentTotal > 0 ? Math.round((sentimentPositive / sentimentTotal) * 100) : 50;
-        var coverageRatio = platformCount > 0 ? platformCoverage / 5 : 0;
+        // Count how many platforms have non-zero scores
+        var platformScores = [chatgptScore, perplexityScore, googleScore, metaScore, alexaScore];
+        var activePlatforms = platformScores.filter(function(s) { return s > 0; }).length;
+        var coverageRatio = activePlatforms / 5;
+        var totalScore = platformScores.reduce(function(a, b) { return a + b; }, 0);
 
-        // Model 5 driver scores from observable signals
-        // 1. Structured Data — inferred from Google AI + Perplexity performance (platforms that weight schema)
-        var googleScore = (platforms['google-ai'] || {}).score || 0;
-        var perplexityScore = (platforms['perplexity'] || platforms['perplexity-shopping'] || {}).score || 0;
-        var structuredData = Math.round((googleScore * 0.6 + perplexityScore * 0.4) * (totalMentions > 10 ? 1.1 : totalMentions > 5 ? 1.0 : 0.85));
+        // Model 5 driver scores from platform performance signals
+
+        // 1. Structured Data — Google AI + Perplexity weight structured schema heavily
+        var structuredData = Math.round(googleScore * 0.55 + perplexityScore * 0.35 + (activePlatforms >= 4 ? 10 : activePlatforms >= 2 ? 5 : 0));
         structuredData = Math.min(100, Math.max(0, structuredData));
 
-        // 2. Knowledge Graph — inferred from platform coverage breadth + primary recommendation rate
-        var primaryRate = totalMentions > 0 ? totalPrimary / totalMentions : 0;
-        var knowledgeGraph = Math.round(coverageRatio * 50 + primaryRate * 30 + (composite > 60 ? 20 : composite > 40 ? 10 : 0));
+        // 2. Knowledge Graph — platform breadth + composite strength signals identity presence
+        var knowledgeGraph = Math.round(coverageRatio * 45 + (composite / 100) * 35 + (activePlatforms === 5 ? 20 : activePlatforms >= 3 ? 10 : 0));
         knowledgeGraph = Math.min(100, Math.max(0, knowledgeGraph));
 
-        // 3. Reviews & Reputation — inferred from sentiment + avg position (higher sentiment + lower position = better reputation signal)
-        var positionScore = positionCount > 0 ? Math.max(0, 100 - (avgPos - 1) * 25) : 40;
-        var reviews = Math.round(sentPct * 0.6 + positionScore * 0.4);
+        // 3. Reviews & Reputation — ChatGPT + Google (reputation-sensitive) + composite as quality proxy
+        var reviews = Math.round(chatgptScore * 0.35 + googleScore * 0.35 + (composite / 100) * 30);
         reviews = Math.min(100, Math.max(0, reviews));
 
-        // 4. Content Footprint — inferred from ChatGPT + Perplexity (platforms that cite web content) + mention volume
-        var chatgptScore = (platforms['chatgpt'] || platforms['chatgpt-shopping'] || {}).score || 0;
-        var mentionBoost = totalMentions > 20 ? 15 : totalMentions > 10 ? 10 : totalMentions > 5 ? 5 : 0;
-        var contentFootprint = Math.round((chatgptScore * 0.5 + perplexityScore * 0.5) * 0.85 + mentionBoost);
+        // 4. Content Footprint — ChatGPT + Perplexity (cite web content directly)
+        var contentFootprint = Math.round(chatgptScore * 0.5 + perplexityScore * 0.4 + (composite > 50 ? 10 : 5));
         contentFootprint = Math.min(100, Math.max(0, contentFootprint));
 
-        // 5. Third-Party Feeds — inferred from Meta AI + Alexa (platforms that rely on external aggregators) + overall breadth
-        var metaScore = (platforms['meta-ai'] || {}).score || 0;
-        var alexaScore = (platforms['alexa'] || platforms['alexa-shopping'] || {}).score || 0;
-        var thirdParty = Math.round(metaScore * 0.4 + alexaScore * 0.3 + coverageRatio * 30);
+        // 5. Third-Party Feeds — Meta AI + Alexa (rely on external aggregators/social signals)
+        var thirdParty = Math.round(metaScore * 0.45 + alexaScore * 0.35 + coverageRatio * 20);
         thirdParty = Math.min(100, Math.max(0, thirdParty));
 
         grocerDrivers[slug] = {
-          name: data.name || slug,
+          name: GROCER_NAMES[slug] || slug,
           composite: composite,
           drivers: {
             'Structured Data': structuredData,
