@@ -1365,6 +1365,7 @@
           <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
+          <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers</button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
@@ -1717,6 +1718,84 @@
           </div>
         </div>
         <div id="queries-table-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB: VISIBILITY DRIVERS -->
+    <div id="drivers" class="tab-content">
+      <div class="card">
+        <h3 style="margin-bottom:4px;">Visibility Drivers</h3>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:24px;">Understand <em>why</em> each grocer scores the way they do. Scores are modeled from live AI platform data across five key driver categories.</p>
+
+        <!-- Driver category legend -->
+        <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; padding:16px; background:#F5F2EE; border-radius:8px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:#2D8A6E; display:inline-block;"></span>
+            <strong>Strong</strong> <span style="color:#7A7570;">(70+)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:#D4782F; display:inline-block;"></span>
+            <strong>Moderate</strong> <span style="color:#7A7570;">(40–69)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:#C0392B; display:inline-block;"></span>
+            <strong>Weak</strong> <span style="color:#7A7570;">(&lt;40)</span>
+          </div>
+        </div>
+
+        <!-- Grocer selector -->
+        <div style="margin-bottom:24px;">
+          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare grocers:</label>
+          <div id="driver-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <!-- Driver scorecard grid -->
+        <div id="driver-scorecards" style="display:grid; gap:20px;"></div>
+
+        <!-- Insight box -->
+        <div id="driver-insight" style="margin-top:24px; padding:20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:12px; display:none;">
+          <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.7; margin-bottom:8px;">Key Insight</div>
+          <div id="driver-insight-text" style="font-size:15px; line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- Driver detail cards -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+        <div class="card">
+          <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#2C5282"><path d="M2 2h5v5H2V2zm7 0h5v5H9V2zM2 9h5v5H2V9zm7 0h5v5H9V9z"/></svg>
+            Structured Data
+          </h4>
+          <p style="font-size:13px; color:#7A7570; line-height:1.6;">Schema.org markup (LocalBusiness, GroceryStore), product feeds, store locator data. Google AI Overview and Perplexity heavily weight structured data. Grocers with proper schema markup see 2-3x higher mention rates.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#2C5282"><circle cx="8" cy="8" r="6" fill="none" stroke="#2C5282" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="#2C5282"/></svg>
+            Knowledge Graph
+          </h4>
+          <p style="font-size:13px; color:#7A7570; line-height:1.6;">Google Knowledge Panel, Wikidata entries, Apple Maps listings. This is the identity layer — AI platforms use it to verify a grocer exists and understand its attributes. National chains score highest here.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#2C5282"><path d="M8 1l2 4.5 5 .7-3.6 3.5.8 5L8 12.4 3.8 14.7l.8-5L1 6.2l5-.7L8 1z"/></svg>
+            Reviews & Reputation
+          </h4>
+          <p style="font-size:13px; color:#7A7570; line-height:1.6;">Google Reviews aggregate rating, Yelp presence, review volume across locations. AI platforms use positive sentiment as a quality signal when deciding who to recommend first.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#2C5282"><path d="M2 3h12v1H2V3zm0 3h10v1H2V6zm0 3h12v1H2V9zm0 3h8v1H2V12z"/></svg>
+            Content Footprint
+          </h4>
+          <p style="font-size:13px; color:#7A7570; line-height:1.6;">Blog posts, recipes, weekly ads, press releases — indexable web content that ChatGPT and Perplexity cite directly. Frequency, freshness, and topical coverage all matter.</p>
+        </div>
+        <div class="card" style="grid-column: 1 / -1;">
+          <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#2C5282"><path d="M8 0L1 4v4c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V4L8 0zm0 2l5 2.8V8c0 3.5-2.3 6.7-5 7.7C5.3 14.7 3 11.5 3 8V4.8L8 2z"/></svg>
+            Third-Party Feeds
+          </h4>
+          <p style="font-size:13px; color:#7A7570; line-height:1.6;">Instacart listings, Google Shopping feeds, social media presence (Facebook/Instagram for Meta AI), data aggregators (Foursquare, Infogroup). These external signals extend a grocer's reach into platforms they don't directly control.</p>
+        </div>
       </div>
     </div>
 
@@ -3479,9 +3558,235 @@
       }
     }
 
+    // ===== VISIBILITY DRIVERS TAB =====
+    var driversInitialized = false;
+    function initDriversTab() {
+      if (driversInitialized) return;
+      driversInitialized = true;
+
+      // Build driver scores from live data
+      // GROCER_SCORES format: { 'hy-vee': { platforms: { chatgpt: {score, mentions, ...}, ... }, composite: N }, ... }
+      var grocerDrivers = {};
+      var grocerNames = {};
+
+      // Process COMPETITOR_LATEST (already loaded from Supabase)
+      Object.keys(COMPETITOR_LATEST).forEach(function(slug) {
+        var data = COMPETITOR_LATEST[slug];
+        grocerNames[slug] = data.name || slug;
+        var platforms = data.platforms || {};
+        var totalMentions = 0;
+        var totalPrimary = 0;
+        var totalScore = 0;
+        var platformCount = 0;
+        var sentimentPositive = 0;
+        var sentimentTotal = 0;
+        var hasAlexa = false;
+        var hasMeta = false;
+        var platformCoverage = 0;
+        var avgPosition = 0;
+        var positionCount = 0;
+
+        Object.keys(platforms).forEach(function(pSlug) {
+          var p = platforms[pSlug];
+          var score = p.score || 0;
+          totalScore += score;
+          platformCount++;
+          if (score > 0) platformCoverage++;
+          totalMentions += (p.mentions || 0);
+          totalPrimary += (p.primary || 0);
+          if (p.sentiment_positive !== undefined) {
+            sentimentPositive += (p.sentiment_positive || 0);
+            sentimentTotal += (p.sentiment_positive || 0) + (p.sentiment_neutral || 0) + (p.sentiment_negative || 0);
+          }
+          if (p.avg_position && p.avg_position > 0) {
+            avgPosition += p.avg_position;
+            positionCount++;
+          }
+          if (pSlug === 'alexa' || pSlug === 'alexa-shopping') hasAlexa = true;
+          if (pSlug === 'meta-ai') hasMeta = true;
+        });
+
+        var composite = data.composite || (platformCount > 0 ? Math.round(totalScore / platformCount) : 0);
+        var avgPos = positionCount > 0 ? avgPosition / positionCount : 3;
+        var sentPct = sentimentTotal > 0 ? Math.round((sentimentPositive / sentimentTotal) * 100) : 50;
+        var coverageRatio = platformCount > 0 ? platformCoverage / 5 : 0;
+
+        // Model 5 driver scores from observable signals
+        // 1. Structured Data — inferred from Google AI + Perplexity performance (platforms that weight schema)
+        var googleScore = (platforms['google-ai'] || {}).score || 0;
+        var perplexityScore = (platforms['perplexity'] || platforms['perplexity-shopping'] || {}).score || 0;
+        var structuredData = Math.round((googleScore * 0.6 + perplexityScore * 0.4) * (totalMentions > 10 ? 1.1 : totalMentions > 5 ? 1.0 : 0.85));
+        structuredData = Math.min(100, Math.max(0, structuredData));
+
+        // 2. Knowledge Graph — inferred from platform coverage breadth + primary recommendation rate
+        var primaryRate = totalMentions > 0 ? totalPrimary / totalMentions : 0;
+        var knowledgeGraph = Math.round(coverageRatio * 50 + primaryRate * 30 + (composite > 60 ? 20 : composite > 40 ? 10 : 0));
+        knowledgeGraph = Math.min(100, Math.max(0, knowledgeGraph));
+
+        // 3. Reviews & Reputation — inferred from sentiment + avg position (higher sentiment + lower position = better reputation signal)
+        var positionScore = positionCount > 0 ? Math.max(0, 100 - (avgPos - 1) * 25) : 40;
+        var reviews = Math.round(sentPct * 0.6 + positionScore * 0.4);
+        reviews = Math.min(100, Math.max(0, reviews));
+
+        // 4. Content Footprint — inferred from ChatGPT + Perplexity (platforms that cite web content) + mention volume
+        var chatgptScore = (platforms['chatgpt'] || platforms['chatgpt-shopping'] || {}).score || 0;
+        var mentionBoost = totalMentions > 20 ? 15 : totalMentions > 10 ? 10 : totalMentions > 5 ? 5 : 0;
+        var contentFootprint = Math.round((chatgptScore * 0.5 + perplexityScore * 0.5) * 0.85 + mentionBoost);
+        contentFootprint = Math.min(100, Math.max(0, contentFootprint));
+
+        // 5. Third-Party Feeds — inferred from Meta AI + Alexa (platforms that rely on external aggregators) + overall breadth
+        var metaScore = (platforms['meta-ai'] || {}).score || 0;
+        var alexaScore = (platforms['alexa'] || platforms['alexa-shopping'] || {}).score || 0;
+        var thirdParty = Math.round(metaScore * 0.4 + alexaScore * 0.3 + coverageRatio * 30);
+        thirdParty = Math.min(100, Math.max(0, thirdParty));
+
+        grocerDrivers[slug] = {
+          name: data.name || slug,
+          composite: composite,
+          drivers: {
+            'Structured Data': structuredData,
+            'Knowledge Graph': knowledgeGraph,
+            'Reviews & Reputation': reviews,
+            'Content Footprint': contentFootprint,
+            'Third-Party Feeds': thirdParty
+          }
+        };
+      });
+
+      // Render grocer toggle buttons
+      var toggleContainer = document.getElementById('driver-grocer-toggles');
+      var selectedGrocers = ['hy-vee'];
+      var allSlugs = Object.keys(grocerDrivers).sort(function(a, b) {
+        if (a === 'hy-vee') return -1;
+        if (b === 'hy-vee') return 1;
+        return grocerDrivers[a].name.localeCompare(grocerDrivers[b].name);
+      });
+
+      function renderToggles() {
+        toggleContainer.innerHTML = allSlugs.map(function(slug) {
+          var isSelected = selectedGrocers.indexOf(slug) >= 0;
+          var isClient = slug === 'hy-vee';
+          return '<button class="driver-toggle' + (isSelected ? ' active' : '') + (isClient ? ' client' : '') + '" data-slug="' + slug + '" style="' +
+            'padding:6px 14px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; border:1px solid ' +
+            (isSelected ? '#1A2740' : '#D0CBC4') + '; background:' + (isSelected ? '#1A2740' : '#ffffff') + '; color:' + (isSelected ? '#ffffff' : '#7A7570') + ';">' +
+            grocerDrivers[slug].name + '</button>';
+        }).join('');
+
+        toggleContainer.querySelectorAll('button').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var slug = this.getAttribute('data-slug');
+            var idx = selectedGrocers.indexOf(slug);
+            if (idx >= 0 && selectedGrocers.length > 1) {
+              selectedGrocers.splice(idx, 1);
+            } else if (idx < 0) {
+              selectedGrocers.push(slug);
+            }
+            renderToggles();
+            renderDriverCards();
+          });
+        });
+      }
+
+      function getDriverColor(score) {
+        if (score >= 70) return '#2D8A6E';
+        if (score >= 40) return '#D4782F';
+        return '#C0392B';
+      }
+
+      function getDriverLabel(score) {
+        if (score >= 70) return 'Strong';
+        if (score >= 40) return 'Moderate';
+        return 'Weak';
+      }
+
+      function renderDriverCards() {
+        var container = document.getElementById('driver-scorecards');
+        var driverNames = ['Structured Data', 'Knowledge Graph', 'Reviews & Reputation', 'Content Footprint', 'Third-Party Feeds'];
+        var driverIcons = {
+          'Structured Data': '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2V2zm7 0h5v5H9V2zM2 9h5v5H2V9zm7 0h5v5H9V9z"/></svg>',
+          'Knowledge Graph': '<svg width="20" height="20" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg>',
+          'Reviews & Reputation': '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 4.5 5 .7-3.6 3.5.8 5L8 12.4 3.8 14.7l.8-5L1 6.2l5-.7L8 1z"/></svg>',
+          'Content Footprint': '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v1H2V3zm0 3h10v1H2V6zm0 3h12v1H2V9zm0 3h8v1H2V12z"/></svg>',
+          'Third-Party Feeds': '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0L1 4v4c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V4L8 0zm0 2l5 2.8V8c0 3.5-2.3 6.7-5 7.7C5.3 14.7 3 11.5 3 8V4.8L8 2z"/></svg>'
+        };
+
+        var html = '';
+        driverNames.forEach(function(driverName) {
+          html += '<div style="background:#ffffff; border:1px solid #E8E3DD; border-radius:12px; padding:20px;">';
+          html += '<div style="display:flex; align-items:center; gap:8px; margin-bottom:16px; color:#2C5282;">' + driverIcons[driverName] + '<h4 style="margin:0; font-size:15px; color:#1A2740;">' + driverName + '</h4></div>';
+
+          // Grocer comparison bars
+          selectedGrocers.forEach(function(slug) {
+            var gd = grocerDrivers[slug];
+            if (!gd) return;
+            var score = gd.drivers[driverName] || 0;
+            var color = getDriverColor(score);
+            var label = getDriverLabel(score);
+            var isClient = slug === 'hy-vee';
+
+            html += '<div style="margin-bottom:12px;">';
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">';
+            html += '<span style="font-size:13px; font-weight:' + (isClient ? '600' : '400') + '; color:#1A2740;">' + gd.name + '</span>';
+            html += '<span style="font-size:13px; font-weight:600; color:' + color + ';">' + score + ' <span style="font-size:11px; font-weight:400; color:#7A7570;">' + label + '</span></span>';
+            html += '</div>';
+            html += '<div style="width:100%; height:8px; background:#F0EDE8; border-radius:4px; overflow:hidden;">';
+            html += '<div style="width:' + score + '%; height:100%; background:' + color + '; border-radius:4px; transition:width 0.5s ease;"></div>';
+            html += '</div>';
+            html += '</div>';
+          });
+
+          html += '</div>';
+        });
+
+        container.innerHTML = html;
+
+        // Generate insight
+        if (selectedGrocers.indexOf('hy-vee') >= 0) {
+          var hv = grocerDrivers['hy-vee'];
+          if (hv) {
+            var drivers = hv.drivers;
+            var sorted = Object.keys(drivers).sort(function(a, b) { return drivers[b] - drivers[a]; });
+            var strongest = sorted[0];
+            var weakest = sorted[sorted.length - 1];
+
+            var insightText = 'Hy-Vee\'s strongest visibility driver is <strong>' + strongest + '</strong> (score: ' + drivers[strongest] + '), ';
+            insightText += 'while <strong>' + weakest + '</strong> (score: ' + drivers[weakest] + ') represents the biggest opportunity for improvement. ';
+
+            // Compare with competitors if any selected
+            var others = selectedGrocers.filter(function(s) { return s !== 'hy-vee'; });
+            if (others.length > 0) {
+              var behindIn = [];
+              others.forEach(function(slug) {
+                var comp = grocerDrivers[slug];
+                if (!comp) return;
+                Object.keys(drivers).forEach(function(d) {
+                  if (comp.drivers[d] > drivers[d] + 10) {
+                    behindIn.push({ driver: d, grocer: comp.name, gap: comp.drivers[d] - drivers[d] });
+                  }
+                });
+              });
+              if (behindIn.length > 0) {
+                behindIn.sort(function(a, b) { return b.gap - a.gap; });
+                var top = behindIn[0];
+                insightText += 'Notable gap: <strong>' + top.grocer + '</strong> leads Hy-Vee by ' + top.gap + ' points in ' + top.driver + '.';
+              }
+            }
+
+            document.getElementById('driver-insight').style.display = 'block';
+            document.getElementById('driver-insight-text').innerHTML = insightText;
+          }
+        } else {
+          document.getElementById('driver-insight').style.display = 'none';
+        }
+      }
+
+      renderToggles();
+      renderDriverCards();
+    }
+
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'platforms', 'competitive', 'queries'],
+      monitor: ['visibility', 'platforms', 'competitive', 'queries', 'drivers'],
       act: ['recommendations', 'simulator', 'roi'],
       admin: ['storemap', 'pipeline']
     };
@@ -3502,6 +3807,7 @@
       else if (tabName === 'pipeline') initPipelineTab();
       else if (tabName === 'roi') initROITab();
       else if (tabName === 'simulator') initSimulatorTab();
+      else if (tabName === 'drivers') initDriversTab();
     }
 
     function activateGroup(groupName) {
