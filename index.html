@@ -4756,31 +4756,43 @@
         }
 
         // === Update COMPETITOR_LATEST from visibility_scores ===
+        // Home market mapping — use each grocer's primary market for accurate scoring
+        const GROCER_HOME_MARKET_MAP = {
+          'hy-vee': 'Des Moines, IA',
+          'fareway': 'Des Moines, IA',
+          'wegmans': 'Rochester, NY',
+          'schnucks': 'St. Louis, MO',
+          'kroger': 'All Markets',
+          'walmart': 'All Markets',
+          'aldi': 'All Markets',
+          'fresh-thyme': 'All Markets',
+        };
         const latestByGrocer = {};
+        const platformMap = {
+          'a1a00000-0000-0000-0000-000000000001': 'chatgpt',
+          'a1a00000-0000-0000-0000-000000000002': 'perplexity',
+          'a1a00000-0000-0000-0000-000000000003': 'google-ai',
+          'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
+          'a1a00000-0000-0000-0000-000000000005': 'alexa',
+        };
+        const grocerMap = {
+          'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
+          'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+          'b1b00000-0000-0000-0000-000000000003': 'schnucks',
+          'b1b00000-0000-0000-0000-000000000004': 'kroger',
+          'b1b00000-0000-0000-0000-000000000005': 'walmart',
+          'b1b00000-0000-0000-0000-000000000006': 'fareway',
+          'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
+          'b1b00000-0000-0000-0000-000000000008': 'aldi',
+        };
         for (const vs of visScores) {
-          // Get grocer slug from GROCERS array
-          const grocer = GROCERS.find(g => g.id === parseInt(vs.grocer_id?.slice(-1)) || true);
-          // Map platform UUID to slug
-          const platformMap = {
-            'a1a00000-0000-0000-0000-000000000001': 'chatgpt',
-            'a1a00000-0000-0000-0000-000000000002': 'perplexity',
-            'a1a00000-0000-0000-0000-000000000003': 'google-ai',
-            'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
-            'a1a00000-0000-0000-0000-000000000005': 'alexa',
-          };
-          const grocerMap = {
-            'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
-            'b1b00000-0000-0000-0000-000000000002': 'wegmans',
-            'b1b00000-0000-0000-0000-000000000003': 'schnucks',
-            'b1b00000-0000-0000-0000-000000000004': 'kroger',
-            'b1b00000-0000-0000-0000-000000000005': 'walmart',
-            'b1b00000-0000-0000-0000-000000000006': 'fareway',
-            'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
-            'b1b00000-0000-0000-0000-000000000008': 'aldi',
-          };
           const gSlug = grocerMap[vs.grocer_id];
           const pSlug = platformMap[vs.platform_id];
           if (!gSlug || !pSlug) continue;
+          // Filter to home market or old data (no target_market)
+          var vsMarket = vs.target_market || null;
+          var homeMarket = GROCER_HOME_MARKET_MAP[gSlug] || 'All Markets';
+          if (vsMarket !== null && vsMarket !== homeMarket) continue;
 
           if (!latestByGrocer[gSlug]) latestByGrocer[gSlug] = {};
           // Only keep the most recent score per platform
@@ -4891,12 +4903,28 @@
             'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
             'b1b00000-0000-0000-0000-000000000008': 'aldi',
           };
-          // Group scores by grocer+date, average all platforms for composite
+          // Home market mapping — use each grocer's primary market for trend continuity
+          // Old data (no target_market) was Iowa-focused, so this maintains apples-to-apples comparison
+          var GROCER_HOME_MARKETS = {
+            'hy-vee': 'Des Moines, IA',
+            'fareway': 'Des Moines, IA',
+            'wegmans': 'Rochester, NY',
+            'schnucks': 'St. Louis, MO',
+            'kroger': 'All Markets',
+            'walmart': 'All Markets',
+            'aldi': 'All Markets',
+            'fresh-thyme': 'All Markets',
+          };
+          // Group scores by grocer+date, using home market scores (or null/All Markets for old data)
           var byGrocerDate = {};
           for (var vi = 0; vi < visScores.length; vi++) {
             var vs2 = visScores[vi];
             var gSlug2 = compGrocerMap[vs2.grocer_id];
             if (!gSlug2) continue;
+            var market = vs2.target_market || null;
+            var homeMarket = GROCER_HOME_MARKETS[gSlug2] || 'All Markets';
+            // Include: old data (no market), or matching home market
+            if (market !== null && market !== homeMarket) continue;
             var dateKey = vs2.score_date;
             if (!byGrocerDate[gSlug2]) byGrocerDate[gSlug2] = {};
             if (!byGrocerDate[gSlug2][dateKey]) byGrocerDate[gSlug2][dateKey] = [];
