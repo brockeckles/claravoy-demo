@@ -1363,6 +1363,7 @@
         <div class="nav-sub-group" data-group="monitor">
           <button class="nav-sub-btn" data-tab="visibility">Visibility Score</button>
           <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers</button>
+          <button class="nav-sub-btn" data-tab="trends">Score Trends</button>
           <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
@@ -1764,6 +1765,51 @@
       </div>
     </div>
 
+    <!-- TAB: SCORE TRENDS -->
+    <div id="trends" class="tab-content">
+      <div class="card">
+        <h3 style="margin-bottom:4px;">Score Trends</h3>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Track how AI visibility scores change over time. Data updates daily from live pipeline runs.</p>
+
+        <!-- Controls row -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+          <!-- View toggle -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button class="trend-view-btn active" data-view="composite" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">Composite Score</button>
+            <button class="trend-view-btn" data-view="platforms" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">By Platform</button>
+          </div>
+          <!-- Time range -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button class="trend-range-btn" data-range="7" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">7 Days</button>
+            <button class="trend-range-btn active" data-range="14" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">14 Days</button>
+            <button class="trend-range-btn" data-range="all" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">All</button>
+          </div>
+        </div>
+
+        <!-- Competitor toggles -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare with competitors:</label>
+          <div id="trend-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <!-- Trend insight card -->
+        <div id="trend-insight" style="padding:14px 18px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; display:none; margin-bottom:20px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M2 14l4-5 3 3 5-8" fill="none" stroke="#D4782F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div id="trend-insight-text" style="font-size:14px; line-height:1.5;"></div>
+          </div>
+        </div>
+
+        <!-- Main chart -->
+        <div style="position:relative; height:380px; margin-bottom:24px;">
+          <canvas id="trend-chart-main"></canvas>
+        </div>
+
+        <!-- Summary stats row -->
+        <div id="trend-stats" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:16px;"></div>
+      </div>
+    </div>
+
     <!-- TAB 6: STORE MAP -->
     <div id="storemap" class="tab-content">
       <!-- Market Score Cards -->
@@ -2033,6 +2079,9 @@
       'meta-ai': [33,34,35,36,35,37,38,37,39,38,40,39,40,41],
       alexa: [15,16,18,17,20,22,21,24,23,25,26,28,27,29]
     };
+
+    // Competitor historical daily composite scores (populated by loadLiveData)
+    var COMPETITOR_DAILY_COMPOSITES = {};
 
     // Competitor latest-day composite scores
     // REAL DATA from 2026-03-24 web search across ChatGPT, Perplexity, Google AI, Meta AI
@@ -3731,9 +3780,339 @@
       renderDriverCards();
     }
 
+    // ===== SCORE TRENDS TAB =====
+    var trendsInitialized = false;
+    var trendChart = null;
+
+    function initTrendsTab() {
+      if (trendsInitialized) return;
+      trendsInitialized = true;
+
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'fareway': 'Fareway',
+        'aldi': 'ALDI', 'fresh-thyme': 'Fresh Thyme', 'kroger': 'Kroger',
+        'wegmans': 'Wegmans', 'schnucks': 'Schnucks'
+      };
+
+      var PLATFORM_COLORS = {
+        'chatgpt': { color: '#10A37F', label: 'ChatGPT' },
+        'perplexity': { color: '#20808D', label: 'Perplexity' },
+        'google-ai': { color: '#4285F4', label: 'Google AI' },
+        'meta-ai': { color: '#0668E1', label: 'Meta AI' },
+        'alexa': { color: '#00CAFF', label: 'Alexa' }
+      };
+
+      var GROCER_COLORS = {
+        'hy-vee': '#1A2740',
+        'walmart': '#0071CE',
+        'fareway': '#C41230',
+        'aldi': '#00205B',
+        'fresh-thyme': '#4CAF50',
+        'kroger': '#E31837',
+        'wegmans': '#00573F',
+        'schnucks': '#D4782F'
+      };
+
+      var selectedGrocers = ['hy-vee'];
+      var currentView = 'composite';
+      var currentRange = 14;
+
+      // Build grocer toggles
+      var toggleContainer = document.getElementById('trend-grocer-toggles');
+      var allSlugs = Object.keys(COMPETITOR_LATEST).sort(function(a, b) {
+        if (a === 'hy-vee') return -1;
+        if (b === 'hy-vee') return 1;
+        return (GROCER_NAMES[a] || a).localeCompare(GROCER_NAMES[b] || b);
+      });
+
+      function renderToggles() {
+        toggleContainer.innerHTML = allSlugs.map(function(slug) {
+          var isSelected = selectedGrocers.indexOf(slug) >= 0;
+          var isClient = slug === 'hy-vee';
+          return '<button class="trend-toggle' + (isSelected ? ' active' : '') + '" data-slug="' + slug + '" style="' +
+            'padding:6px 14px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; border:1px solid ' +
+            (isSelected ? (GROCER_COLORS[slug] || '#1A2740') : '#D0CBC4') + '; background:' +
+            (isSelected ? (GROCER_COLORS[slug] || '#1A2740') : '#ffffff') + '; color:' +
+            (isSelected ? '#ffffff' : '#7A7570') + ';">' +
+            (GROCER_NAMES[slug] || slug) + '</button>';
+        }).join('');
+
+        toggleContainer.querySelectorAll('button').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var slug = this.getAttribute('data-slug');
+            if (slug === 'hy-vee') return; // Always keep Hy-Vee selected
+            var idx = selectedGrocers.indexOf(slug);
+            if (idx >= 0) {
+              selectedGrocers.splice(idx, 1);
+            } else {
+              selectedGrocers.push(slug);
+            }
+            renderToggles();
+            renderTrendChart();
+          });
+        });
+      }
+
+      function getSlicedData(dates, dataArr) {
+        if (currentRange === 'all' || !dates) return { dates: dates || [], data: dataArr || [] };
+        var n = parseInt(currentRange) || 14;
+        var slicedDates = dates.slice(-n);
+        var slicedData = dataArr ? dataArr.slice(-n) : [];
+        return { dates: slicedDates, data: slicedData };
+      }
+
+      function renderTrendChart() {
+        var canvas = document.getElementById('trend-chart-main');
+        var ctx = canvas.getContext('2d');
+
+        if (trendChart) {
+          trendChart.destroy();
+          trendChart = null;
+        }
+
+        // Get date labels
+        var rawDates = window.TREND_RAW_DATES || [];
+        var dateLabels = rawDates.length > 0
+          ? rawDates.map(function(d) {
+              var dt = new Date(d + 'T00:00:00');
+              return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            })
+          : TREND_DATES;
+
+        // Slice for range
+        var rangeN = currentRange === 'all' ? dateLabels.length : parseInt(currentRange);
+        var labels = dateLabels.slice(-rangeN);
+
+        var datasets = [];
+
+        if (currentView === 'composite') {
+          // Composite view — one line per selected grocer
+          selectedGrocers.forEach(function(slug) {
+            var composites = COMPETITOR_DAILY_COMPOSITES[slug] || [];
+            var sliced = composites.slice(-rangeN);
+            datasets.push({
+              label: GROCER_NAMES[slug] || slug,
+              data: sliced,
+              borderColor: GROCER_COLORS[slug] || '#999',
+              backgroundColor: (GROCER_COLORS[slug] || '#999') + '18',
+              borderWidth: slug === 'hy-vee' ? 3 : 2,
+              pointRadius: slug === 'hy-vee' ? 4 : 3,
+              pointBackgroundColor: GROCER_COLORS[slug] || '#999',
+              tension: 0.3,
+              fill: slug === 'hy-vee',
+              spanGaps: true
+            });
+          });
+        } else {
+          // Platform view — one line per platform for Hy-Vee
+          Object.keys(PLATFORM_COLORS).forEach(function(pSlug) {
+            var scores = HYVEE_DAILY_SCORES[pSlug] || [];
+            var sliced = scores.slice(-rangeN);
+            datasets.push({
+              label: PLATFORM_COLORS[pSlug].label,
+              data: sliced,
+              borderColor: PLATFORM_COLORS[pSlug].color,
+              backgroundColor: PLATFORM_COLORS[pSlug].color + '18',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: PLATFORM_COLORS[pSlug].color,
+              tension: 0.3,
+              fill: false,
+              spanGaps: true
+            });
+          });
+        }
+
+        trendChart = new Chart(ctx, {
+          type: 'line',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  padding: 16,
+                  font: { family: "'Inter', sans-serif", size: 12 }
+                }
+              },
+              tooltip: {
+                backgroundColor: '#1A2740',
+                titleFont: { family: "'Inter', sans-serif", size: 13 },
+                bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(context) {
+                    return context.dataset.label + ': ' + (context.parsed.y !== null ? context.parsed.y : 'N/A');
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                min: 0,
+                max: 100,
+                grid: { color: '#E8E3DD' },
+                ticks: {
+                  font: { family: "'Inter', sans-serif", size: 11 },
+                  color: '#7A7570',
+                  callback: function(v) { return v; }
+                },
+                title: {
+                  display: true,
+                  text: currentView === 'composite' ? 'Composite Score' : 'Platform Score',
+                  font: { family: "'Inter', sans-serif", size: 12, weight: '500' },
+                  color: '#7A7570'
+                }
+              },
+              x: {
+                grid: { display: false },
+                ticks: {
+                  font: { family: "'Inter', sans-serif", size: 11 },
+                  color: '#7A7570'
+                }
+              }
+            }
+          }
+        });
+
+        // Update stats and insight
+        renderTrendStats(rangeN);
+        renderTrendInsight(rangeN);
+      }
+
+      function renderTrendStats(rangeN) {
+        var statsContainer = document.getElementById('trend-stats');
+        var hvComposites = COMPETITOR_DAILY_COMPOSITES['hy-vee'] || [];
+        var sliced = hvComposites.slice(-rangeN).filter(function(v) { return v !== null; });
+
+        if (sliced.length < 2) {
+          statsContainer.innerHTML = '<p style="color:#7A7570; font-size:13px; grid-column:1/-1;">Not enough data points for statistics.</p>';
+          return;
+        }
+
+        var current = sliced[sliced.length - 1];
+        var first = sliced[0];
+        var change = current - first;
+        var changeDir = change > 0 ? '+' : '';
+        var changeColor = change > 0 ? '#2D8A6E' : change < 0 ? '#C0392B' : '#7A7570';
+
+        var avg = Math.round(sliced.reduce(function(a, b) { return a + b; }, 0) / sliced.length);
+        var max = Math.max.apply(null, sliced);
+        var min = Math.min.apply(null, sliced);
+
+        var cards = [
+          { label: 'Current Score', value: current, color: '#1A2740' },
+          { label: 'Period Change', value: changeDir + change + ' pts', color: changeColor },
+          { label: 'Period Average', value: avg, color: '#1A2740' },
+          { label: 'Range (High / Low)', value: max + ' / ' + min, color: '#1A2740' }
+        ];
+
+        statsContainer.innerHTML = cards.map(function(c) {
+          return '<div style="background:#F5F2EE; border-radius:10px; padding:16px; text-align:center;">' +
+            '<div style="font-size:11px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">' + c.label + '</div>' +
+            '<div style="font-size:22px; font-weight:700; color:' + c.color + ';">' + c.value + '</div>' +
+            '</div>';
+        }).join('');
+      }
+
+      function renderTrendInsight(rangeN) {
+        var insightEl = document.getElementById('trend-insight');
+        var insightText = document.getElementById('trend-insight-text');
+        var hvComposites = COMPETITOR_DAILY_COMPOSITES['hy-vee'] || [];
+        var sliced = hvComposites.slice(-rangeN).filter(function(v) { return v !== null; });
+
+        if (sliced.length < 2) {
+          insightEl.style.display = 'none';
+          return;
+        }
+
+        var current = sliced[sliced.length - 1];
+        var first = sliced[0];
+        var change = current - first;
+        var html = '';
+
+        if (change > 0) {
+          html = 'Hy-Vee\'s composite score has <strong>increased ' + change + ' points</strong> over this period, rising from ' + first + ' to ' + current + '. ';
+        } else if (change < 0) {
+          html = 'Hy-Vee\'s composite score has <strong>decreased ' + Math.abs(change) + ' points</strong> over this period, dropping from ' + first + ' to ' + current + '. ';
+        } else {
+          html = 'Hy-Vee\'s composite score has <strong>remained steady at ' + current + '</strong> over this period. ';
+        }
+
+        // Find biggest mover among selected competitors
+        var others = selectedGrocers.filter(function(s) { return s !== 'hy-vee'; });
+        if (others.length > 0) {
+          var biggestGap = null;
+          others.forEach(function(slug) {
+            var compData = COMPETITOR_DAILY_COMPOSITES[slug] || [];
+            var compSliced = compData.slice(-rangeN).filter(function(v) { return v !== null; });
+            if (compSliced.length >= 2) {
+              var compCurrent = compSliced[compSliced.length - 1];
+              var gap = compCurrent - current;
+              if (!biggestGap || Math.abs(gap) > Math.abs(biggestGap.gap)) {
+                biggestGap = { slug: slug, name: GROCER_NAMES[slug], gap: gap, score: compCurrent };
+              }
+            }
+          });
+          if (biggestGap) {
+            if (biggestGap.gap > 0) {
+              html += '<strong>' + biggestGap.name + '</strong> currently leads by ' + biggestGap.gap + ' points (' + biggestGap.score + ' vs ' + current + ').';
+            } else if (biggestGap.gap < 0) {
+              html += 'Hy-Vee leads <strong>' + biggestGap.name + '</strong> by ' + Math.abs(biggestGap.gap) + ' points (' + current + ' vs ' + biggestGap.score + ').';
+            }
+          }
+        }
+
+        insightEl.style.display = 'block';
+        insightText.innerHTML = html;
+      }
+
+      // View toggle handlers
+      document.querySelectorAll('.trend-view-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.trend-view-btn').forEach(function(b) {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = '#7A7570';
+          });
+          this.classList.add('active');
+          this.style.background = '#1A2740';
+          this.style.color = '#fff';
+          currentView = this.getAttribute('data-view');
+          renderTrendChart();
+        });
+      });
+
+      // Range toggle handlers
+      document.querySelectorAll('.trend-range-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.trend-range-btn').forEach(function(b) {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = '#7A7570';
+          });
+          this.classList.add('active');
+          this.style.background = '#1A2740';
+          this.style.color = '#fff';
+          var rangeVal = this.getAttribute('data-range');
+          currentRange = rangeVal === 'all' ? 'all' : parseInt(rangeVal);
+          renderTrendChart();
+        });
+      });
+
+      renderToggles();
+      renderTrendChart();
+    }
+
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'drivers', 'platforms', 'competitive', 'queries'],
+      monitor: ['visibility', 'drivers', 'trends', 'platforms', 'competitive', 'queries'],
       act: ['recommendations', 'simulator', 'roi'],
       admin: ['storemap', 'pipeline']
     };
@@ -3755,6 +4134,7 @@
       else if (tabName === 'roi') initROITab();
       else if (tabName === 'simulator') initSimulatorTab();
       else if (tabName === 'drivers') initDriversTab();
+      else if (tabName === 'trends') initTrendsTab();
     }
 
     function activateGroup(groupName) {
@@ -3973,6 +4353,53 @@
               return null; // no data for this date
             });
           }
+        }
+
+        // === Build COMPETITOR_DAILY_COMPOSITES from all visibility_scores ===
+        if (visScores && visScores.length > 0) {
+          var compGrocerMap = {
+            'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
+            'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+            'b1b00000-0000-0000-0000-000000000003': 'schnucks',
+            'b1b00000-0000-0000-0000-000000000004': 'kroger',
+            'b1b00000-0000-0000-0000-000000000005': 'walmart',
+            'b1b00000-0000-0000-0000-000000000006': 'fareway',
+            'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
+            'b1b00000-0000-0000-0000-000000000008': 'aldi',
+          };
+          // Group scores by grocer+date, average all platforms for composite
+          var byGrocerDate = {};
+          for (var vi = 0; vi < visScores.length; vi++) {
+            var vs2 = visScores[vi];
+            var gSlug2 = compGrocerMap[vs2.grocer_id];
+            if (!gSlug2) continue;
+            var dateKey = vs2.score_date;
+            if (!byGrocerDate[gSlug2]) byGrocerDate[gSlug2] = {};
+            if (!byGrocerDate[gSlug2][dateKey]) byGrocerDate[gSlug2][dateKey] = [];
+            byGrocerDate[gSlug2][dateKey].push(parseFloat(vs2.overall_score) || 0);
+          }
+          // Build composites aligned to TREND_DATES (raw date strings)
+          var rawDates = dailyScores ? [...new Set(dailyScores.map(function(r) { return r.score_date; }))].sort() : [];
+          // Also collect all dates from all grocers
+          Object.values(byGrocerDate).forEach(function(dateMap) {
+            Object.keys(dateMap).forEach(function(d) {
+              if (rawDates.indexOf(d) < 0) rawDates.push(d);
+            });
+          });
+          rawDates.sort();
+          var trendRawDates = rawDates.slice(-14);
+          // Store raw dates globally for range filtering
+          window.TREND_RAW_DATES = trendRawDates;
+
+          Object.keys(byGrocerDate).forEach(function(gSlug3) {
+            COMPETITOR_DAILY_COMPOSITES[gSlug3] = trendRawDates.map(function(d) {
+              var scores = byGrocerDate[gSlug3][d];
+              if (scores && scores.length > 0) {
+                return Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+              }
+              return null;
+            });
+          });
         }
 
         // === Update RECENT_MENTIONS from grocer_mentions ===
