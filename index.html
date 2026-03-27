@@ -2589,6 +2589,7 @@
     let storeMap = null;
     // Per-market Hy-Vee composite scores (populated in loadLiveData)
     let MARKET_SCORES = {};
+    let MARKET_MENTION_COUNTS = {};
     // Currently selected market on the store map (independent of global filter)
     let mapActiveMarket = 'all';
 
@@ -2736,6 +2737,7 @@
       markets.forEach(function(market) {
         var hyveeStores = STORE_LOCATIONS['hy-vee'].stores.filter(function(s) { return s.market === market; });
         var score = MARKET_SCORES[market] || 0;
+        var mentions = MARKET_MENTION_COUNTS[market] || 0;
         var color = score >= 60 ? '#2D8A6E' : score >= 35 ? '#D4782F' : '#C0392B';
 
         var totalDots = 0;
@@ -2743,11 +2745,22 @@
           totalDots += g.stores.filter(function(s) { return s.market === market; }).length;
         });
 
-        html += '<div class="market-score-card' + (mapActiveMarket === market ? ' active' : '') + '" data-map-market="' + market + '" title="Click to zoom into ' + market + '. Score reflects Hy-Vee\'s AI visibility in this specific market.">';
+        // Detect store/visibility mismatches for insight badges
+        var insightHtml = '';
+        if (hyveeStores.length === 0 && score > 0) {
+          insightHtml = '<div style="font-size: 10px; color: #D4782F; margin-top: 4px; font-style: italic;">No Hy-Vee stores here — AI mentions may be inaccurate</div>';
+        } else if (hyveeStores.length > 0 && score === 0 && mentions === 0) {
+          insightHtml = '<div style="font-size: 10px; color: #C0392B; margin-top: 4px; font-style: italic;">Visibility gap — ' + hyveeStores.length + ' store' + (hyveeStores.length > 1 ? 's' : '') + ' but no AI mentions</div>';
+        }
+
+        var mentionLabel = mentions === 1 ? '1 AI mention' : mentions + ' AI mentions';
+
+        html += '<div class="market-score-card' + (mapActiveMarket === market ? ' active' : '') + '" data-map-market="' + market + '" title="Click to zoom into ' + market + '. Score reflects Hy-Vee\'s AI visibility in this specific market based on ' + mentions + ' mention' + (mentions !== 1 ? 's' : '') + '.">';
         html += '<div class="market-name">' + market + '</div>';
         html += '<div class="market-score" style="color: ' + color + ';">' + score + '<span style="font-size: 14px; color: #9A9590;">/100</span></div>';
         html += '<div style="font-size: 11px; color: #9A9590; margin-top: 2px;">Hy-Vee Visibility Score</div>';
-        html += '<div class="market-stores" style="margin-top: 6px;">' + hyveeStores.length + ' Hy-Vee · ' + totalDots + ' total stores</div>';
+        html += '<div class="market-stores" style="margin-top: 6px;">' + hyveeStores.length + ' Hy-Vee · ' + totalDots + ' total · ' + mentionLabel + '</div>';
+        html += insightHtml;
         html += '</div>';
       });
 
@@ -4937,6 +4950,7 @@
           .eq('grocer_id', hyveeId)
           .limit(500);
         MARKET_SCORES = {};
+        MARKET_MENTION_COUNTS = {};
         if (hyveeMentions && hyveeMentions.length > 0) {
           var byMarket = {};
           for (var mi = 0; mi < hyveeMentions.length; mi++) {
@@ -4948,12 +4962,13 @@
           for (var mKey of Object.keys(byMarket)) {
             var scores = byMarket[mKey];
             MARKET_SCORES[mKey] = Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+            MARKET_MENTION_COUNTS[mKey] = scores.length;
           }
         }
         // Fallback: if no per-market mention data, use composite
         if (Object.keys(MARKET_SCORES).length === 0) {
           var fallbackScore = (COMPETITOR_LATEST['hy-vee'] || {}).composite || 0;
-          Object.keys(MARKET_REGIONS).forEach(function(m) { MARKET_SCORES[m] = fallbackScore; });
+          Object.keys(MARKET_REGIONS).forEach(function(m) { MARKET_SCORES[m] = fallbackScore; MARKET_MENTION_COUNTS[m] = 0; });
         }
 
         // === Update HYVEE_DAILY_SCORES from visibility_scores ===
