@@ -2354,7 +2354,7 @@
         <div class="card-title">Attribution Insight</div>
         <div id="roi-attr-insight-text" style="font-size: 14px; color: #1A2740; line-height: 1.6;"></div>
       </div>
-      <div id="roi-attr-stats-row" class="grid-4" style="display:none; margin-bottom: 24px;"></div>
+      <div id="roi-attr-stats-row" style="display:none; margin-bottom: 24px;"></div>
       <div id="roi-attr-chart-container" class="card" style="display:none; margin-bottom: 24px;">
         <div class="card-title">Visibility Score vs. Weekly Sales Lift</div>
         <div style="height: 380px; position: relative;"><canvas id="roi-attr-chart"></canvas></div>
@@ -2408,7 +2408,7 @@
         <div class="card-title">Key Insight</div>
         <div id="cpg-insight-text" style="font-size: 14px; color: #1A2740; line-height: 1.6;"></div>
       </div>
-      <div id="cpg-stats-row" class="grid-4" style="display:none; margin-bottom: 24px;"></div>
+      <div id="cpg-stats-row" style="display:none; margin-bottom: 24px;"></div>
       <div id="cpg-filters" style="display:none; margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
         <select id="cpg-category-filter" style="padding: 8px 14px; border: 1px solid #D0CBC4; border-radius: 8px; font-size: 13px; background: white; color: #1A2740;">
           <option value="all">All Categories</option>
@@ -2440,7 +2440,7 @@
         <div class="card-title">Expansion Opportunity</div>
         <div id="exp-insight-text" style="font-size: 14px; color: #1A2740; line-height: 1.6;"></div>
       </div>
-      <div id="exp-stats-row" class="grid-4" style="display:none; margin-bottom: 24px;"></div>
+      <div id="exp-stats-row" style="display:none; margin-bottom: 24px;"></div>
       <div id="exp-chart-container" class="card" style="display:none; margin-bottom: 24px;">
         <div class="card-title">Market Demand vs. Store Presence</div>
         <div style="height: 360px; position: relative;"><canvas id="exp-chart"></canvas></div>
@@ -6590,16 +6590,18 @@
       statsRow.style.display = '';
       var hvTotal = 0;
       Object.keys(CPG_BRANDS).forEach(function(brand) { hvTotal += (CPG_BRANDS[brand].mentions['hy-vee'] || 0); });
-      statsRow.innerHTML = [
+      var cpgStats = [
         { l: 'CPG Brands Tracked', v: totalBrands, c: '#5B4A9E' },
         { l: 'Total Brand Mentions', v: totalMentions, c: '#2C5282' },
         { l: 'Hy-Vee Brand Mentions', v: hvTotal, c: '#2D8A6E' },
         { l: 'Hy-Vee Leads Brand', v: hvLeadCount + '/' + totalBrands, c: '#D4782F' }
-      ].map(function(s) {
-        return '<div class="card" style="text-align:center;">' +
-          '<div class="text-secondary" style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
-          '<div style="font-size:28px; font-weight:700; color:' + s.c + '; margin-top:8px;">' + s.v + '</div></div>';
-      }).join('');
+      ];
+      statsRow.innerHTML = '<div class="card" style="padding:16px 20px;"><div style="display:grid; grid-template-columns:repeat(' + cpgStats.length + ', 1fr); gap:0;">' +
+        cpgStats.map(function(s, i) {
+          return '<div style="text-align:center; padding:8px 12px;' + (i < cpgStats.length - 1 ? ' border-right:1px solid #E8E3DD;' : '') + '">' +
+            '<div style="font-size:10px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
+            '<div style="font-size:20px; font-weight:700; color:' + s.c + '; margin-top:4px;">' + s.v + '</div></div>';
+        }).join('') + '</div></div>';
 
       // Insight
       // Find brand where Hy-Vee leads most strongly
@@ -6741,16 +6743,18 @@
       EXPANSION_MARKETS.forEach(function(m) { totalStores += m.hvStores; });
       var statsRow = document.getElementById('exp-stats-row');
       statsRow.style.display = '';
-      statsRow.innerHTML = [
+      var expStats = [
         { l: 'Markets Analyzed', v: totalMarkets, c: '#2C5282' },
         { l: 'Hy-Vee Stores', v: totalStores, c: '#2D8A6E' },
         { l: 'Emerging Markets', v: emergingMarkets, c: '#D4782F' },
         { l: 'Expansion Opportunities', v: oppMarkets, c: '#5B4A9E' }
-      ].map(function(s) {
-        return '<div class="card" style="text-align:center;">' +
-          '<div class="text-secondary" style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
-          '<div style="font-size:28px; font-weight:700; color:' + s.c + '; margin-top:8px;">' + s.v + '</div></div>';
-      }).join('');
+      ];
+      statsRow.innerHTML = '<div class="card" style="padding:16px 20px;"><div style="display:grid; grid-template-columns:repeat(' + expStats.length + ', 1fr); gap:0;">' +
+        expStats.map(function(s, i) {
+          return '<div style="text-align:center; padding:8px 12px;' + (i < expStats.length - 1 ? ' border-right:1px solid #E8E3DD;' : '') + '">' +
+            '<div style="font-size:10px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
+            '<div style="font-size:20px; font-weight:700; color:' + s.c + '; margin-top:4px;">' + s.v + '</div></div>';
+        }).join('') + '</div></div>';
 
       // Insight
       var topOpp = EXPANSION_MARKETS.filter(function(m) { return m.latentDemand === 'high'; });
@@ -6913,16 +6917,18 @@
       // Stats
       var statsRow = document.getElementById('roi-attr-stats-row');
       statsRow.style.display = '';
-      statsRow.innerHTML = [
+      var roiStats = [
         { l: 'Monthly AI-Attributed Lift', v: '$' + Math.round(totalLift / 1000) + 'K', c: '#2D8A6E' },
         { l: 'Annualized Lift', v: '$' + (annualizedLift / 1000000).toFixed(1) + 'M', c: '#2C5282' },
         { l: 'Avg Correlation (r)', v: avgCorr, c: '#5B4A9E' },
         { l: 'Monthly AI Searches', v: Math.round(totalSearches / WEEKS.length * 4.3).toLocaleString(), c: '#D4782F' }
-      ].map(function(s) {
-        return '<div class="card" style="text-align:center;">' +
-          '<div class="text-secondary" style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
-          '<div style="font-size:28px; font-weight:700; color:' + s.c + '; margin-top:8px;">' + s.v + '</div></div>';
-      }).join('');
+      ];
+      statsRow.innerHTML = '<div class="card" style="padding:16px 20px;"><div style="display:grid; grid-template-columns:repeat(' + roiStats.length + ', 1fr); gap:0;">' +
+        roiStats.map(function(s, i) {
+          return '<div style="text-align:center; padding:8px 12px;' + (i < roiStats.length - 1 ? ' border-right:1px solid #E8E3DD;' : '') + '">' +
+            '<div style="font-size:10px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
+            '<div style="font-size:20px; font-weight:700; color:' + s.c + '; margin-top:4px;">' + s.v + '</div></div>';
+        }).join('') + '</div></div>';
 
       // Insight
       var insightCard = document.getElementById('roi-attr-insight-card');
