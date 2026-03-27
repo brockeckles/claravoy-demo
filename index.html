@@ -1442,6 +1442,7 @@
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
           <button class="nav-sub-btn" data-tab="categories">Category Scores <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="sentiment">Sentiment <span class="new-badge">New</span></button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
@@ -1920,6 +1921,10 @@
             <button class="trend-range-btn active" data-range="14" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">14 Days</button>
             <button class="trend-range-btn" data-range="all" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">All</button>
           </div>
+          <!-- Promo overlay toggle -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button id="trend-promo-toggle" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">&#9733; Promos</button>
+          </div>
         </div>
 
         <!-- Competitor toggles -->
@@ -1943,6 +1948,13 @@
 
         <!-- Summary stats row -->
         <div id="trend-stats" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:16px;"></div>
+
+        <!-- Promo periods legend (hidden by default) -->
+        <div id="trend-promo-legend" style="display:none; padding:16px 20px; background:#F5F2EE; border-radius:10px; margin-top:16px;">
+          <div style="font-size:12px; font-weight:600; color:#1A2740; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Promotional Periods</div>
+          <div id="trend-promo-items" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px;"></div>
+          <div style="font-size:11px; color:#A09A94; margin-top:10px;">Shaded regions on the chart indicate active promotional periods. Overlaying promos with score trends helps identify which campaigns influence AI visibility.</div>
+        </div>
       </div>
     </div>
 
@@ -2131,6 +2143,49 @@
           <h4 style="margin:0 0 16px 0; color:#1A2740; font-size:15px; font-weight:600;">Category Breakdown</h4>
           <div id="cat-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- TAB: AI SENTIMENT BY DEPARTMENT -->
+    <div id="sentiment" class="tab-content">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+          <h3 style="margin:0;">AI Sentiment by Department</h3>
+          <div style="display:flex; gap:8px;">
+            <select id="sent-grocer-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+              <option value="all">All Grocers</option>
+            </select>
+            <select id="sent-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+              <option value="all">All Markets</option>
+            </select>
+          </div>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">How AI platforms characterize each grocer across departments. Surfaces perception gaps — where AI narrative doesn't match reality — so category managers can take targeted action.</p>
+
+        <div id="sent-loading" style="text-align:center; padding:40px; color:#7A7570;">
+          <div style="font-size:14px;">Loading sentiment data...</div>
+        </div>
+
+        <!-- Insight card -->
+        <div id="sent-insight" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:20px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+            <div id="sent-insight-text" style="font-size:14px; line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Summary stats -->
+        <div id="sent-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:24px;"></div>
+
+        <!-- Stacked bar chart -->
+        <div id="sent-chart-section" style="display:none; margin-bottom:24px;">
+          <div style="position:relative; height:360px;">
+            <canvas id="sent-chart-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Department detail cards -->
+        <div id="sent-detail-cards" style="display:none; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
       </div>
     </div>
 
@@ -4087,6 +4142,70 @@
       var selectedGrocers = ['hy-vee'];
       var currentView = 'composite';
       var currentRange = 14;
+      var showPromos = false;
+
+      // Demo promotional periods (replace with real data when available)
+      var PROMO_PERIODS = [
+        { start: '2026-03-12', end: '2026-03-15', label: 'Spring Savings Weekly Ad', color: 'rgba(45, 138, 110, 0.12)', borderColor: '#2D8A6E', type: 'Weekly Ad' },
+        { start: '2026-03-17', end: '2026-03-20', label: 'March Madness Snack Event', color: 'rgba(212, 120, 47, 0.12)', borderColor: '#D4782F', type: 'Seasonal Event' },
+        { start: '2026-03-24', end: '2026-03-27', label: 'Easter Prep Sale', color: 'rgba(91, 74, 158, 0.12)', borderColor: '#5B4A9E', type: 'Holiday Promo' }
+      ];
+
+      // Chart.js plugin for promo period overlays
+      var promoOverlayPlugin = {
+        id: 'promoOverlay',
+        beforeDraw: function(chart) {
+          if (!showPromos) return;
+          var xScale = chart.scales.x;
+          var yScale = chart.scales.y;
+          var ctx = chart.ctx;
+          var labels = chart.data.labels;
+          if (!labels || labels.length === 0) return;
+
+          var rawDates = window.TREND_RAW_DATES || [];
+          var rangeN = currentRange === 'all' ? rawDates.length : parseInt(currentRange);
+          var slicedDates = rawDates.slice(-rangeN);
+
+          PROMO_PERIODS.forEach(function(promo) {
+            // Find label indices that fall within promo period
+            var startIdx = -1, endIdx = -1;
+            for (var i = 0; i < slicedDates.length; i++) {
+              if (slicedDates[i] >= promo.start && slicedDates[i] <= promo.end) {
+                if (startIdx === -1) startIdx = i;
+                endIdx = i;
+              }
+            }
+            if (startIdx === -1) return;
+
+            // Get pixel coordinates
+            var x1 = xScale.getPixelForValue(Math.max(0, startIdx - 0.4));
+            var x2 = xScale.getPixelForValue(Math.min(labels.length - 1, endIdx + 0.4));
+            var yTop = yScale.top;
+            var yBottom = yScale.bottom;
+
+            // Draw shaded rectangle
+            ctx.save();
+            ctx.fillStyle = promo.color;
+            ctx.fillRect(x1, yTop, x2 - x1, yBottom - yTop);
+
+            // Draw top border
+            ctx.strokeStyle = promo.borderColor;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x1, yTop);
+            ctx.lineTo(x2, yTop);
+            ctx.stroke();
+
+            // Draw label at top
+            ctx.fillStyle = promo.borderColor;
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(promo.label, (x1 + x2) / 2, yTop - 4);
+            ctx.restore();
+          });
+        }
+      };
 
       // Build grocer toggles
       var toggleContainer = document.getElementById('trend-grocer-toggles');
@@ -4197,7 +4316,9 @@
         trendChart = new Chart(ctx, {
           type: 'line',
           data: { labels: labels, datasets: datasets },
+          plugins: [promoOverlayPlugin],
           options: {
+            layout: { padding: { top: showPromos ? 18 : 0 } },
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
@@ -4375,6 +4496,26 @@
           currentRange = rangeVal === 'all' ? 'all' : parseInt(rangeVal);
           renderTrendChart();
         });
+      });
+
+      // Promo toggle handler
+      var promoToggle = document.getElementById('trend-promo-toggle');
+      promoToggle.addEventListener('click', function() {
+        showPromos = !showPromos;
+        this.style.background = showPromos ? '#D4782F' : 'transparent';
+        this.style.color = showPromos ? '#fff' : '#7A7570';
+        document.getElementById('trend-promo-legend').style.display = showPromos ? 'block' : 'none';
+
+        // Populate promo legend
+        if (showPromos) {
+          document.getElementById('trend-promo-items').innerHTML = PROMO_PERIODS.map(function(p) {
+            return '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#fff; border-radius:6px; border-left:3px solid ' + p.borderColor + ';">' +
+              '<div><div style="font-size:13px; font-weight:600; color:#1A2740;">' + p.label + '</div>' +
+              '<div style="font-size:11px; color:#7A7570;">' + p.type + ' · ' + p.start.slice(5) + ' to ' + p.end.slice(5) + '</div></div></div>';
+          }).join('');
+        }
+
+        renderTrendChart();
       });
 
       renderToggles();
@@ -4594,6 +4735,264 @@
     }
 
     // ===== QUERY GAP ANALYSIS TAB =====
+    // ─── AI SENTIMENT BY DEPARTMENT TAB ─────────────────────────────────────────
+    var sentimentInitialized = false;
+    function initSentimentTab() {
+      if (sentimentInitialized) return;
+      sentimentInitialized = true;
+
+      var CATEGORY_LABELS = {
+        'convenience': 'Convenience & Access', 'delivery_options': 'Delivery & Online',
+        'general_discovery': 'General Discovery', 'loyalty_program': 'Loyalty Programs',
+        'price_comparison': 'Price & Value', 'product_availability': 'Product Range',
+        'quality_reputation': 'Quality & Reputation', 'specialty_department': 'Specialty Departments',
+        'store_recommendation': 'Store Recommendations'
+      };
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'aldi': 'ALDI', 'fareway': 'Fareway',
+        'fresh-thyme': 'Fresh Thyme', 'schnucks': 'Schnucks', 'kroger': 'Kroger', 'wegmans': 'Wegmans'
+      };
+      var SENT_COLORS = { positive: '#2D8A6E', neutral: '#D4782F', negative: '#C0392B' };
+      var EXCLUDED_MARKETS = { 'Rochester, NY': true };
+      var grocerIdMap = {
+        'b1b00000-0000-0000-0000-000000000001': 'hy-vee', 'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+        'b1b00000-0000-0000-0000-000000000003': 'schnucks', 'b1b00000-0000-0000-0000-000000000004': 'kroger',
+        'b1b00000-0000-0000-0000-000000000005': 'walmart', 'b1b00000-0000-0000-0000-000000000006': 'fareway',
+        'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme', 'b1b00000-0000-0000-0000-000000000008': 'aldi'
+      };
+
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      sb.from('grocer_mentions')
+        .select('grocer_id, sentiment, mention_type, description_snippet, grocers(slug), query_library(query_category, target_market)')
+        .neq('mention_type', 'not_mentioned')
+        .order('captured_at', { ascending: false })
+        .limit(2000)
+        .then(function(result) {
+          var mentions = result.data || [];
+          processSentimentData(mentions);
+        })
+        .catch(function() {
+          document.getElementById('sent-loading').innerHTML = '<div style="color:#C0392B;">Failed to load sentiment data.</div>';
+        });
+
+      var sentChart = null;
+
+      function processSentimentData(mentions) {
+        document.getElementById('sent-loading').style.display = 'none';
+
+        // Build: { market → grocer → category → { positive, neutral, negative, snippets[] } }
+        var allMarkets = {};
+        var allGrocers = {};
+        var data = {};
+
+        mentions.forEach(function(m) {
+          var gSlug = grocerIdMap[m.grocer_id] || (m.grocers && m.grocers.slug);
+          var cat = m.query_library && m.query_library.query_category;
+          var market = m.query_library && m.query_library.target_market;
+          var sent = m.sentiment || 'neutral';
+          if (!gSlug || !cat || !market || EXCLUDED_MARKETS[market]) return;
+
+          allMarkets[market] = true;
+          allGrocers[gSlug] = true;
+          var mKey = market;
+          if (!data[mKey]) data[mKey] = {};
+          if (!data[mKey][gSlug]) data[mKey][gSlug] = {};
+          if (!data[mKey][gSlug][cat]) data[mKey][gSlug][cat] = { positive: 0, neutral: 0, negative: 0, snippets: [] };
+          data[mKey][gSlug][cat][sent]++;
+          if (m.description_snippet && data[mKey][gSlug][cat].snippets.length < 2) {
+            data[mKey][gSlug][cat].snippets.push(m.description_snippet.slice(0, 120));
+          }
+        });
+
+        // Build 'all' aggregate
+        data['all'] = {};
+        Object.keys(data).forEach(function(mkt) {
+          if (mkt === 'all') return;
+          Object.keys(data[mkt]).forEach(function(g) {
+            if (!data['all'][g]) data['all'][g] = {};
+            Object.keys(data[mkt][g]).forEach(function(cat) {
+              if (!data['all'][g][cat]) data['all'][g][cat] = { positive: 0, neutral: 0, negative: 0, snippets: [] };
+              data['all'][g][cat].positive += data[mkt][g][cat].positive;
+              data['all'][g][cat].neutral += data[mkt][g][cat].neutral;
+              data['all'][g][cat].negative += data[mkt][g][cat].negative;
+              data['all'][g][cat].snippets = data['all'][g][cat].snippets.concat(data[mkt][g][cat].snippets).slice(0, 2);
+            });
+          });
+        });
+
+        // Populate filters
+        var mktFilter = document.getElementById('sent-market-filter');
+        Object.keys(allMarkets).sort().forEach(function(m) {
+          var opt = document.createElement('option');
+          opt.value = m; opt.textContent = m; mktFilter.appendChild(opt);
+        });
+        var gFilter = document.getElementById('sent-grocer-filter');
+        var gSorted = Object.keys(allGrocers).sort(function(a,b) {
+          if (a === 'hy-vee') return -1; if (b === 'hy-vee') return 1;
+          return (GROCER_NAMES[a]||a).localeCompare(GROCER_NAMES[b]||b);
+        });
+        gSorted.forEach(function(g) {
+          var opt = document.createElement('option');
+          opt.value = g; opt.textContent = GROCER_NAMES[g] || g; gFilter.appendChild(opt);
+        });
+
+        function renderSentiment(marketKey, grocerFilter) {
+          var mktData = data[marketKey] || {};
+
+          // Determine which grocers to show
+          var grocers = grocerFilter === 'all' ? Object.keys(mktData).sort(function(a,b) {
+            if (a === 'hy-vee') return -1; if (b === 'hy-vee') return 1;
+            return (GROCER_NAMES[a]||a).localeCompare(GROCER_NAMES[b]||b);
+          }) : (mktData[grocerFilter] ? [grocerFilter] : []);
+
+          var categories = Object.keys(CATEGORY_LABELS).filter(function(c) {
+            return grocers.some(function(g) { return mktData[g] && mktData[g][c]; });
+          });
+
+          // For chart: show Hy-Vee sentiment by category (stacked horizontal bar)
+          var chartGrocer = grocerFilter !== 'all' ? grocerFilter : 'hy-vee';
+          var gData = mktData[chartGrocer] || {};
+          var chartCats = categories.filter(function(c) { return gData[c]; });
+          var chartLabels = chartCats.map(function(c) { return CATEGORY_LABELS[c] || c; });
+
+          document.getElementById('sent-chart-section').style.display = 'block';
+          var ctx = document.getElementById('sent-chart-canvas').getContext('2d');
+          if (sentChart) sentChart.destroy();
+
+          sentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: chartLabels,
+              datasets: [
+                { label: 'Positive', data: chartCats.map(function(c) { return gData[c] ? gData[c].positive : 0; }), backgroundColor: '#2D8A6E', borderRadius: 4 },
+                { label: 'Neutral', data: chartCats.map(function(c) { return gData[c] ? gData[c].neutral : 0; }), backgroundColor: '#D4782F', borderRadius: 4 },
+                { label: 'Negative', data: chartCats.map(function(c) { return gData[c] ? gData[c].negative : 0; }), backgroundColor: '#C0392B', borderRadius: 4 }
+              ]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true, maintainAspectRatio: false,
+              scales: {
+                x: { stacked: true, grid: { color: '#E8E3DD' }, ticks: { font: { size: 11 }, color: '#7A7570' }, title: { display: true, text: 'Mention Count', font: { size: 12 }, color: '#7A7570' } },
+                y: { stacked: true, grid: { display: false }, ticks: { font: { size: 12, weight: '500' }, color: '#1A2740' } }
+              },
+              plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } },
+                tooltip: { backgroundColor: '#1A2740', cornerRadius: 8, padding: 12 }
+              }
+            }
+          });
+
+          // Stats
+          var totalPos = 0, totalNeut = 0, totalNeg = 0, totalMentions = 0;
+          grocers.forEach(function(g) {
+            categories.forEach(function(c) {
+              if (mktData[g] && mktData[g][c]) {
+                totalPos += mktData[g][c].positive;
+                totalNeut += mktData[g][c].neutral;
+                totalNeg += mktData[g][c].negative;
+              }
+            });
+          });
+          totalMentions = totalPos + totalNeut + totalNeg;
+          var posRate = totalMentions > 0 ? Math.round((totalPos / totalMentions) * 100) : 0;
+
+          document.getElementById('sent-stats').style.display = 'grid';
+          document.getElementById('sent-stats').innerHTML = [
+            { label: 'Total Mentions', value: totalMentions, color: '#2C5282' },
+            { label: 'Positive', value: totalPos, color: '#2D8A6E' },
+            { label: 'Neutral', value: totalNeut, color: '#D4782F' },
+            { label: 'Negative', value: totalNeg, color: totalNeg > 0 ? '#C0392B' : '#7A7570' }
+          ].map(function(s) {
+            return '<div style="background:#F5F2EE; border-radius:10px; padding:16px; text-align:center;">' +
+              '<div style="font-size:11px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">' + s.label + '</div>' +
+              '<div style="font-size:22px; font-weight:700; color:' + s.color + ';">' + s.value + '</div></div>';
+          }).join('');
+
+          // Insight
+          document.getElementById('sent-insight').style.display = 'block';
+          var insightName = grocerFilter !== 'all' ? (GROCER_NAMES[grocerFilter] || grocerFilter) : 'across all grocers';
+          var negCats = [];
+          if (grocerFilter !== 'all' && mktData[grocerFilter]) {
+            categories.forEach(function(c) {
+              var d = mktData[grocerFilter][c];
+              if (d && d.negative > 0) negCats.push(CATEGORY_LABELS[c]);
+            });
+          } else {
+            // Find categories with any negative for Hy-Vee
+            categories.forEach(function(c) {
+              if (mktData['hy-vee'] && mktData['hy-vee'][c] && mktData['hy-vee'][c].negative > 0) negCats.push(CATEGORY_LABELS[c]);
+            });
+          }
+
+          var insightHtml = '<strong>' + posRate + '% positive sentiment</strong> ' + insightName + '. ';
+          if (negCats.length > 0) {
+            insightHtml += 'Negative sentiment detected in: <strong>' + negCats.join(', ') + '</strong>. These are perception gaps worth investigating — the AI narrative may not reflect your actual strengths.';
+          } else {
+            insightHtml += 'No negative sentiment detected — AI platforms portray the brand favorably across all tracked categories.';
+          }
+          document.getElementById('sent-insight-text').innerHTML = insightHtml;
+
+          // Detail cards — one per category showing sentiment breakdown for each grocer
+          document.getElementById('sent-detail-cards').style.display = 'grid';
+          document.getElementById('sent-detail-cards').innerHTML = categories.map(function(cat) {
+            var catLabel = CATEGORY_LABELS[cat] || cat;
+
+            // Build per-grocer rows for this category
+            var rows = grocers.filter(function(g) { return mktData[g] && mktData[g][cat]; }).map(function(g) {
+              var d = mktData[g][cat];
+              var total = d.positive + d.neutral + d.negative;
+              var pPct = total > 0 ? Math.round((d.positive / total) * 100) : 0;
+              var nPct = total > 0 ? Math.round((d.neutral / total) * 100) : 0;
+              var negPct = total > 0 ? Math.round((d.negative / total) * 100) : 0;
+              var isClient = g === 'hy-vee';
+
+              return '<div style="padding:6px 0; border-bottom:1px solid #F0EDE8;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+                '<span style="font-size:12px; font-weight:' + (isClient ? '700' : '400') + '; color:#1A2740;">' + (GROCER_NAMES[g] || g) + '</span>' +
+                '<span style="font-size:11px; color:#7A7570;">' + total + ' mentions</span></div>' +
+                '<div style="display:flex; height:8px; border-radius:4px; overflow:hidden; gap:1px;">' +
+                (pPct > 0 ? '<div style="width:' + pPct + '%; background:#2D8A6E;" title="Positive ' + pPct + '%"></div>' : '') +
+                (nPct > 0 ? '<div style="width:' + nPct + '%; background:#D4782F;" title="Neutral ' + nPct + '%"></div>' : '') +
+                (negPct > 0 ? '<div style="width:' + negPct + '%; background:#C0392B;" title="Negative ' + negPct + '%"></div>' : '') +
+                '</div>' +
+                '<div style="display:flex; gap:8px; margin-top:3px;">' +
+                '<span style="font-size:10px; color:#2D8A6E;">' + pPct + '% pos</span>' +
+                '<span style="font-size:10px; color:#D4782F;">' + nPct + '% neut</span>' +
+                (negPct > 0 ? '<span style="font-size:10px; color:#C0392B;">' + negPct + '% neg</span>' : '') +
+                '</div></div>';
+            }).join('');
+
+            // Overall sentiment for card header color
+            var catTotal = { p: 0, n: 0, neg: 0 };
+            grocers.forEach(function(g) {
+              if (mktData[g] && mktData[g][cat]) {
+                catTotal.p += mktData[g][cat].positive;
+                catTotal.n += mktData[g][cat].neutral;
+                catTotal.neg += mktData[g][cat].negative;
+              }
+            });
+            var headerColor = catTotal.neg > 0 ? '#C0392B' : catTotal.p > catTotal.n ? '#2D8A6E' : '#D4782F';
+
+            return '<div style="padding:14px 16px; background:#fff; border:1px solid #D0CBC4; border-radius:10px; border-top:3px solid ' + headerColor + ';">' +
+              '<div style="font-size:14px; font-weight:600; color:#1A2740; margin-bottom:10px;">' + catLabel + '</div>' +
+              rows + '</div>';
+          }).join('');
+        }
+
+        // Initial render
+        renderSentiment('all', 'all');
+
+        // Filter handlers
+        document.getElementById('sent-market-filter').addEventListener('change', function() {
+          renderSentiment(this.value, document.getElementById('sent-grocer-filter').value);
+        });
+        document.getElementById('sent-grocer-filter').addEventListener('change', function() {
+          renderSentiment(document.getElementById('sent-market-filter').value, this.value);
+        });
+      }
+    }
+
     // ─── CONTENT STRATEGY ENGINE TAB ────────────────────────────────────────────
     var contentStrategyInitialized = false;
     function initContentStrategyTab() {
@@ -5491,7 +5890,7 @@
 
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries', 'categories'],
+      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries', 'categories', 'sentiment'],
       act: ['recommendations', 'querygap', 'contentstrategy', 'simulator', 'roi', 'storemap'],
       admin: ['pipeline']
     };
@@ -5517,6 +5916,7 @@
       else if (tabName === 'alerts') initAlertsTab();
       else if (tabName === 'querygap') initQueryGapTab();
       else if (tabName === 'categories') initCategoryTab();
+      else if (tabName === 'sentiment') initSentimentTab();
       else if (tabName === 'contentstrategy') initContentStrategyTab();
     }
 
