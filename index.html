@@ -387,6 +387,79 @@
       font-weight: 600;
       box-shadow: 0 1px 3px rgba(26, 39, 64, 0.08);
     }
+    .new-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #C8956C, #B07A50);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .whats-new-card {
+      background: linear-gradient(135deg, #FAF7F2, #F0EBE3);
+      border: 1px solid #D0CBC4;
+      border-left: 4px solid #C8956C;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .whats-new-card h4 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: #1A2740;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .whats-new-card .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 8px;
+    }
+    .whats-new-card .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #3D3630;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .whats-new-card .feature-item:hover {
+      border-color: #C8956C;
+      box-shadow: 0 2px 8px rgba(200, 149, 108, 0.15);
+    }
+    .whats-new-card .feature-item .feat-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .whats-new-dismiss {
+      background: none;
+      border: none;
+      color: #7A7570;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 4px;
+      margin-left: auto;
+      line-height: 1;
+    }
+    .whats-new-dismiss:hover { color: #1A2740; }
 
     .nav-sub-group {
       display: none;
@@ -1362,18 +1435,18 @@
       <div class="nav-secondary">
         <div class="nav-sub-group" data-group="monitor">
           <button class="nav-sub-btn" data-tab="visibility">Visibility Score</button>
-          <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers</button>
-          <button class="nav-sub-btn" data-tab="trends">Score Trends</button>
-          <button class="nav-sub-btn" data-tab="alerts">What Changed</button>
+          <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="trends">Score Trends <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="alerts">What Changed <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
-          <button class="nav-sub-btn" data-tab="querygap">Query Gaps</button>
-          <button class="nav-sub-btn" data-tab="simulator">AI Simulator</button>
-          <button class="nav-sub-btn" data-tab="roi">ROI Calculator</button>
+          <button class="nav-sub-btn" data-tab="querygap">Query Gaps <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="simulator">AI Simulator <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="roi">ROI Calculator <span class="new-badge">New</span></button>
         </div>
         <div class="nav-sub-group" data-group="admin">
           <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
@@ -1384,6 +1457,40 @@
 
     <!-- TAB 0: OVERVIEW -->
     <div id="overview" class="tab-content active">
+
+      <!-- What's New Card -->
+      <div class="whats-new-card" id="whats-new-card">
+        <h4>
+          <span style="font-size:18px;">&#9889;</span> What's New This Week
+          <button class="whats-new-dismiss" onclick="document.getElementById('whats-new-card').style.display='none'" title="Dismiss">&times;</button>
+        </h4>
+        <div class="feature-list">
+          <div class="feature-item" onclick="switchToTab('drivers')">
+            <div class="feat-icon" style="background:#E8F4E8; color:#2E7D32;">&#9776;</div>
+            <div><strong>Visibility Drivers</strong><br><span style="color:#7A7570; font-size:12px;">See WHY each grocer scores the way they do</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('trends')">
+            <div class="feat-icon" style="background:#E3F2FD; color:#1565C0;">&#128200;</div>
+            <div><strong>Score Trends</strong><br><span style="color:#7A7570; font-size:12px;">14-day trend charts with competitor comparison</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('alerts')">
+            <div class="feat-icon" style="background:#FFF3E0; color:#E65100;">&#128276;</div>
+            <div><strong>What Changed</strong><br><span style="color:#7A7570; font-size:12px;">Auto-generated weekly change alerts</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('querygap')">
+            <div class="feat-icon" style="background:#FCE4EC; color:#C62828;">&#128269;</div>
+            <div><strong>Query Gaps</strong><br><span style="color:#7A7570; font-size:12px;">Find where competitors appear but Hy-Vee doesn't</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('simulator')">
+            <div class="feat-icon" style="background:#F3E5F5; color:#7B1FA2;">&#129302;</div>
+            <div><strong>AI Simulator</strong><br><span style="color:#7A7570; font-size:12px;">See how AI platforms respond to grocery queries</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('roi')">
+            <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128176;</div>
+            <div><strong>ROI Calculator</strong><br><span style="color:#7A7570; font-size:12px;">Calculate revenue impact of improved visibility</span></div>
+          </div>
+        </div>
+      </div>
 
       <!-- Hero -->
       <div class="overview-hero">
