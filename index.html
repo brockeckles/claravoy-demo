@@ -4785,20 +4785,27 @@
           'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
           'b1b00000-0000-0000-0000-000000000008': 'aldi',
         };
+        // Two-pass: collect home market and All Markets scores, prefer home market
+        const latestHome = {};
+        const latestAll = {};
         for (const vs of visScores) {
           const gSlug = grocerMap[vs.grocer_id];
           const pSlug = platformMap[vs.platform_id];
           if (!gSlug || !pSlug) continue;
-          // Filter to home market or old data (no target_market)
-          var vsMarket = vs.target_market || null;
-          var homeMarket = GROCER_HOME_MARKET_MAP[gSlug] || 'All Markets';
-          if (vsMarket !== null && vsMarket !== homeMarket) continue;
-
-          if (!latestByGrocer[gSlug]) latestByGrocer[gSlug] = {};
-          // Only keep the most recent score per platform
-          if (!latestByGrocer[gSlug][pSlug] || vs.score_date > latestByGrocer[gSlug]._date) {
-            latestByGrocer[gSlug][pSlug] = Math.round(vs.overall_score);
+          const vsMarket = vs.target_market || 'All Markets';
+          const homeMarket = GROCER_HOME_MARKET_MAP[gSlug] || 'All Markets';
+          const bucket = (vsMarket === homeMarket) ? latestHome : (vsMarket === 'All Markets') ? latestAll : null;
+          if (!bucket) continue;
+          if (!bucket[gSlug]) bucket[gSlug] = { _date: '' };
+          if (!bucket[gSlug][pSlug] || vs.score_date > bucket[gSlug]._date) {
+            bucket[gSlug][pSlug] = Math.round(vs.overall_score);
+            bucket[gSlug]._date = vs.score_date;
           }
+        }
+        // Merge: prefer home market scores, fall back to All Markets
+        const latestByGrocer = {};
+        for (const slug of Object.keys(Object.assign({}, latestHome, latestAll))) {
+          latestByGrocer[slug] = Object.assign({}, latestAll[slug] || {}, latestHome[slug] || {});
         }
 
         // Merge live scores into COMPETITOR_LATEST
@@ -4846,7 +4853,7 @@
         // === Update HYVEE_DAILY_SCORES from visibility_scores ===
         const { data: dailyScores } = await sb
           .from('visibility_scores')
-          .select('score_date, platform_id, overall_score')
+          .select('score_date, platform_id, overall_score, target_market')
           .eq('grocer_id', 'b1b00000-0000-0000-0000-000000000001')
           .order('score_date', { ascending: true })
           .limit(500);
@@ -4859,14 +4866,27 @@
             'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
             'a1a00000-0000-0000-0000-000000000005': 'alexa',
           };
-          // Group by date+platform, average scores
-          const byDatePlat = {};
+          // Two-pass: prefer home market (Des Moines) over All Markets for Hy-Vee
+          const byDatePlatHome = {};
+          const byDatePlatAll = {};
           for (const row of dailyScores) {
             const pSlug = platMap[row.platform_id];
             if (!pSlug) continue;
+            const mkt = row.target_market || 'All Markets';
             const key = row.score_date + '|' + pSlug;
-            if (!byDatePlat[key]) byDatePlat[key] = { date: row.score_date, platform: pSlug, scores: [] };
-            byDatePlat[key].scores.push(row.overall_score || 0);
+            if (mkt === 'Des Moines, IA') {
+              if (!byDatePlatHome[key]) byDatePlatHome[key] = { date: row.score_date, platform: pSlug, scores: [] };
+              byDatePlatHome[key].scores.push(row.overall_score || 0);
+            } else if (mkt === 'All Markets') {
+              if (!byDatePlatAll[key]) byDatePlatAll[key] = { date: row.score_date, platform: pSlug, scores: [] };
+              byDatePlatAll[key].scores.push(row.overall_score || 0);
+            }
+          }
+          // Merge: prefer home market, fall back to All Markets
+          const byDatePlat = {};
+          const allKeys = Object.keys(Object.assign({}, byDatePlatHome, byDatePlatAll));
+          for (const key of allKeys) {
+            byDatePlat[key] = byDatePlatHome[key] || byDatePlatAll[key];
           }
           // Get sorted unique dates (last 14)
           const allDates = [...new Set(dailyScores.map(r => r.score_date))].sort();
@@ -4903,8 +4923,8 @@
             'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
             'b1b00000-0000-0000-0000-000000000008': 'aldi',
           };
-          // Home market mapping — use each grocer's primary market for trend continuity
-          // Old data (no target_market) was Iowa-focused, so this maintains apples-to-apples comparison
+          // Home market mapping — prefer each grocer's primary market for trend accuracy
+          // Old data only has "All Markets"; new data has per-market breakdowns
           var GROCER_HOME_MARKETS = {
             'hy-vee': 'Des Moines, IA',
             'fareway': 'Des Moines, IA',
@@ -4915,21 +4935,39 @@
             'aldi': 'All Markets',
             'fresh-thyme': 'All Markets',
           };
-          // Group scores by grocer+date, using home market scores (or null/All Markets for old data)
-          var byGrocerDate = {};
+          // Two-pass approach: collect home market AND All Markets scores per grocer/date,
+          // then prefer home market when available, fall back to All Markets
+          var byGrocerDateHome = {};
+          var byGrocerDateAll = {};
           for (var vi = 0; vi < visScores.length; vi++) {
             var vs2 = visScores[vi];
             var gSlug2 = compGrocerMap[vs2.grocer_id];
             if (!gSlug2) continue;
-            var market = vs2.target_market || null;
+            var market = vs2.target_market || 'All Markets';
             var homeMarket = GROCER_HOME_MARKETS[gSlug2] || 'All Markets';
-            // Include: old data (no market), or matching home market
-            if (market !== null && market !== homeMarket) continue;
             var dateKey = vs2.score_date;
-            if (!byGrocerDate[gSlug2]) byGrocerDate[gSlug2] = {};
-            if (!byGrocerDate[gSlug2][dateKey]) byGrocerDate[gSlug2][dateKey] = [];
-            byGrocerDate[gSlug2][dateKey].push(parseFloat(vs2.overall_score) || 0);
+            if (market === homeMarket) {
+              if (!byGrocerDateHome[gSlug2]) byGrocerDateHome[gSlug2] = {};
+              if (!byGrocerDateHome[gSlug2][dateKey]) byGrocerDateHome[gSlug2][dateKey] = [];
+              byGrocerDateHome[gSlug2][dateKey].push(parseFloat(vs2.overall_score) || 0);
+            } else if (market === 'All Markets') {
+              if (!byGrocerDateAll[gSlug2]) byGrocerDateAll[gSlug2] = {};
+              if (!byGrocerDateAll[gSlug2][dateKey]) byGrocerDateAll[gSlug2][dateKey] = [];
+              byGrocerDateAll[gSlug2][dateKey].push(parseFloat(vs2.overall_score) || 0);
+            }
           }
+          // Merge: prefer home market, fall back to All Markets
+          var byGrocerDate = {};
+          var allSlugs = Object.keys(Object.assign({}, byGrocerDateHome, byGrocerDateAll));
+          allSlugs.forEach(function(slug) {
+            byGrocerDate[slug] = {};
+            var homeDates = byGrocerDateHome[slug] || {};
+            var allDates = byGrocerDateAll[slug] || {};
+            var allKeys = Object.keys(Object.assign({}, homeDates, allDates));
+            allKeys.forEach(function(d) {
+              byGrocerDate[slug][d] = homeDates[d] || allDates[d];
+            });
+          });
           // Build composites aligned to TREND_DATES (raw date strings)
           var rawDates = dailyScores ? [...new Set(dailyScores.map(function(r) { return r.score_date; }))].sort() : [];
           // Also collect all dates from all grocers
