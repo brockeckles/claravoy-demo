@@ -307,17 +307,20 @@
       color: #2C5282;
     }
 
-    /* Tab Bar */
-    .tab-bar {
-      display: flex;
-      gap: 8px;
+    /* Grouped Navigation */
+    .nav-wrapper {
       margin-bottom: 32px;
+    }
+
+    .nav-primary {
+      display: flex;
+      gap: 4px;
       border-bottom: 1px solid #D0CBC4;
       padding-bottom: 0;
     }
 
-    .tab-button {
-      padding: 12px 16px;
+    .nav-group-btn {
+      padding: 12px 20px;
       background: transparent;
       border: none;
       color: #7A7570;
@@ -328,16 +331,70 @@
       transition: all 0.2s;
       position: relative;
       top: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .tab-button:hover {
+    .nav-group-btn:hover {
       color: #1A2740;
     }
 
-    .tab-button.active {
+    .nav-group-btn.active {
       color: #1A2740;
       border-bottom-color: #1A2740;
       font-weight: 600;
+    }
+
+    .nav-group-btn .nav-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+    }
+
+    .nav-group-btn.active .nav-icon {
+      opacity: 1;
+    }
+
+    .nav-secondary {
+      display: flex;
+      gap: 4px;
+      padding: 8px 0 0 0;
+      min-height: 40px;
+    }
+
+    .nav-sub-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #7A7570;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-sub-btn:hover {
+      color: #1A2740;
+      background: rgba(26, 39, 64, 0.04);
+    }
+
+    .nav-sub-btn.active {
+      color: #1A2740;
+      background: #ffffff;
+      border-color: #D0CBC4;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(26, 39, 64, 0.08);
+    }
+
+    .nav-sub-group {
+      display: none;
+    }
+
+    .nav-sub-group.active {
+      display: flex;
+      gap: 4px;
     }
 
     /* Tab Content */
@@ -1283,17 +1340,42 @@
     </div>
 
     <!-- Tab Bar -->
-    <div class="tab-bar">
-      <button class="tab-button active" data-tab="overview">Overview</button>
-      <button class="tab-button" data-tab="visibility">Visibility Score</button>
-      <button class="tab-button" data-tab="platforms">Platform Breakdown</button>
-      <button class="tab-button" data-tab="competitive">Competitive Landscape</button>
-      <button class="tab-button" data-tab="queries">Query Intelligence</button>
-      <button class="tab-button" data-tab="storemap">Store Map</button>
-      <button class="tab-button" data-tab="recommendations">Recommendations</button>
-      <button class="tab-button" data-tab="simulator">AI Simulator</button>
-      <button class="tab-button" data-tab="roi">ROI Calculator</button>
-      <button class="tab-button" data-tab="pipeline">Pipeline Status</button>
+    <div class="nav-wrapper">
+      <div class="nav-primary">
+        <button class="nav-group-btn active" data-group="overview" data-tab="overview">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.4L1.5 6.5V14h4.25V10h4.5v4H14.5V6.5L8 1.4z"/></svg>
+          Overview
+        </button>
+        <button class="nav-group-btn" data-group="monitor">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM8 4v4.5l3 1.5-.5 1L7 9V4h1z"/></svg>
+          Monitor
+        </button>
+        <button class="nav-group-btn" data-group="act">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2A1.5 1.5 0 001 3.5v9A1.5 1.5 0 002.5 14h11a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0013.5 2h-11zM3 5h10v1H3V5zm0 3h6v1H3V8z"/></svg>
+          Act
+        </button>
+        <button class="nav-group-btn" data-group="admin">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1.5 4v4c0 3.87 2.77 7.49 6.5 8.25C11.73 15.49 14.5 11.87 14.5 8V4L8 1zm0 1.62L13 5.1v2.9c0 3.22-2.26 6.19-5 6.94C5.26 14.19 3 11.22 3 8V5.1l5-2.48z"/></svg>
+          Admin
+        </button>
+      </div>
+      <div class="nav-secondary">
+        <div class="nav-sub-group" data-group="monitor">
+          <button class="nav-sub-btn" data-tab="visibility">Visibility Score</button>
+          <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
+          <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
+          <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
+        </div>
+        <div class="nav-sub-group" data-group="act">
+          <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
+          <button class="nav-sub-btn" data-tab="simulator">AI Simulator</button>
+          <button class="nav-sub-btn" data-tab="roi">ROI Calculator</button>
+        </div>
+        <div class="nav-sub-group" data-group="admin">
+          <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
+          <button class="nav-sub-btn" data-tab="pipeline">Pipeline Status</button>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 0: OVERVIEW -->
@@ -3397,32 +3479,76 @@
       }
     }
 
-    // ===== EVENT HANDLERS =====
-    document.querySelectorAll('.tab-button').forEach(button => {
-      button.addEventListener('click', function() {
-        const tabName = this.getAttribute('data-tab');
+    // ===== GROUPED NAVIGATION HANDLERS =====
+    var NAV_GROUPS = {
+      monitor: ['visibility', 'platforms', 'competitive', 'queries'],
+      act: ['recommendations', 'simulator', 'roi'],
+      admin: ['storemap', 'pipeline']
+    };
 
-        // Update active button
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    function switchToTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
+      // Show selected tab
+      var selectedTab = document.getElementById(tabName);
+      if (selectedTab) selectedTab.classList.add('active');
+      // Initialize tab if needed
+      if (tabName === 'visibility') initVisibilityTab();
+      else if (tabName === 'platforms') initPlatformsTab();
+      else if (tabName === 'competitive') initCompetitiveTab();
+      else if (tabName === 'queries') initQueriesTab();
+      else if (tabName === 'storemap') initStoreMapTab();
+      else if (tabName === 'recommendations') initRecommendationsTab();
+      else if (tabName === 'pipeline') initPipelineTab();
+      else if (tabName === 'roi') initROITab();
+      else if (tabName === 'simulator') initSimulatorTab();
+    }
+
+    function activateGroup(groupName) {
+      // Update primary nav
+      document.querySelectorAll('.nav-group-btn').forEach(function(b) { b.classList.remove('active'); });
+      var groupBtn = document.querySelector('.nav-group-btn[data-group="' + groupName + '"]');
+      if (groupBtn) groupBtn.classList.add('active');
+      // Show/hide secondary nav groups
+      document.querySelectorAll('.nav-sub-group').forEach(function(g) { g.classList.remove('active'); });
+      var subGroup = document.querySelector('.nav-sub-group[data-group="' + groupName + '"]');
+      if (subGroup) subGroup.classList.add('active');
+    }
+
+    // Primary nav group clicks
+    document.querySelectorAll('.nav-group-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var groupName = this.getAttribute('data-group');
+        var directTab = this.getAttribute('data-tab');
+
+        if (directTab) {
+          // Overview — direct tab, no sub-nav
+          activateGroup(groupName);
+          document.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+          switchToTab(directTab);
+        } else {
+          // Group button — show sub-tabs, select first
+          activateGroup(groupName);
+          var firstTab = NAV_GROUPS[groupName][0];
+          document.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+          var firstBtn = document.querySelector('.nav-sub-group[data-group="' + groupName + '"] .nav-sub-btn');
+          if (firstBtn) firstBtn.classList.add('active');
+          switchToTab(firstTab);
+        }
+      });
+    });
+
+    // Secondary sub-tab clicks
+    document.querySelectorAll('.nav-sub-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tabName = this.getAttribute('data-tab');
+        // Update active sub-button within the group
+        var parentGroup = this.closest('.nav-sub-group');
+        if (parentGroup) {
+          parentGroup.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+        }
         this.classList.add('active');
-
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-
-        // Show selected tab
-        const selectedTab = document.getElementById(tabName);
-        selectedTab.classList.add('active');
-
-        // Initialize tab if needed (overview is static, no init needed)
-        if (tabName === 'visibility') initVisibilityTab();
-        else if (tabName === 'platforms') initPlatformsTab();
-        else if (tabName === 'competitive') initCompetitiveTab();
-        else if (tabName === 'queries') initQueriesTab();
-        else if (tabName === 'storemap') initStoreMapTab();
-        else if (tabName === 'recommendations') initRecommendationsTab();
-        else if (tabName === 'pipeline') initPipelineTab();
-        else if (tabName === 'roi') initROITab();
-        else if (tabName === 'simulator') initSimulatorTab();
+        switchToTab(tabName);
       });
     });
 
@@ -3709,8 +3835,13 @@
         trackEvent('page_load', 'overview');
       });
 
-      // Track tab switches (hook into existing tab buttons)
-      document.querySelectorAll('.tab-button').forEach(function(btn) {
+      // Track tab switches (hook into grouped nav buttons)
+      document.querySelectorAll('.nav-group-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          trackEvent('tab_view', this.getAttribute('data-tab') || this.getAttribute('data-group'));
+        });
+      });
+      document.querySelectorAll('.nav-sub-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
           trackEvent('tab_view', this.getAttribute('data-tab'));
         });
