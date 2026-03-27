@@ -1441,6 +1441,7 @@
           <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
           <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
+          <button class="nav-sub-btn" data-tab="categories">Category Scores <span class="new-badge">New</span></button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
@@ -1488,6 +1489,10 @@
           <div class="feature-item" onclick="switchToTab('roi')">
             <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128176;</div>
             <div><strong>ROI Calculator</strong><br><span style="color:#7A7570; font-size:12px;">Calculate revenue impact of improved visibility</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('categories')">
+            <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#11044;</div>
+            <div><strong>Category Scores</strong><br><span style="color:#7A7570; font-size:12px;">Radar chart breakdown by department and topic</span></div>
           </div>
         </div>
       </div>
@@ -1544,11 +1549,11 @@
               <div class="status-label">AI Platforms</div>
             </div>
             <div class="status-item">
-              <div class="status-value">40</div>
+              <div class="status-value">30</div>
               <div class="status-label">Monitored Queries</div>
             </div>
             <div class="status-item">
-              <div class="status-value">5</div>
+              <div class="status-value">4</div>
               <div class="status-label">Markets</div>
             </div>
             <div class="status-item">
@@ -1579,6 +1584,24 @@
           <p style="margin-top: 16px; font-size: 12px; color: #A09A94;">
             Additional platforms (Apple Intelligence, Microsoft Copilot, Samsung Bixby) are on the near-term roadmap.
           </p>
+        </div>
+      </div>
+
+      <!-- Category Visibility Snapshot -->
+      <div class="overview-grid">
+        <div class="overview-section overview-full">
+          <h3><span class="section-icon" style="background:#E8F5F0; color:#2D8A6E;">⬡</span> Category Visibility Snapshot</h3>
+          <p>Hy-Vee's AI visibility broken down by query category — see where the brand leads and where competitors have the edge.</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:center; margin-top:16px;">
+            <div style="max-width:320px; margin:0 auto; width:100%;">
+              <canvas id="overview-cat-radar" width="320" height="280"></canvas>
+            </div>
+            <div>
+              <div id="overview-cat-insight" style="font-size:13px; color:#5A5550; line-height:1.7; margin-bottom:12px;"></div>
+              <div id="overview-cat-mini-stats" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px;"></div>
+              <button onclick="switchToTab('categories')" style="padding:8px 16px; background:#2D8A6E; color:#fff; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:500;">View Full Breakdown</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2056,6 +2079,52 @@
         <div class="card" id="sim-summary-card" style="display: none; margin-top: 16px;">
           <div class="card-title">Visibility Summary</div>
           <div id="sim-summary-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CATEGORY SCORES -->
+    <div id="categories" class="tab-content">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+          <h3 style="margin:0;">Category Visibility Scores</h3>
+          <select id="cat-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+            <option value="all">All Markets</option>
+          </select>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">How Hy-Vee's AI visibility breaks down across query categories. Identifies which departments and topics drive strong AI recommendations — and where competitors lead.</p>
+
+        <!-- Loading state -->
+        <div id="cat-loading" style="text-align:center; padding:40px; color:#7A7570;">
+          <div style="font-size:14px;">Loading category data from pipeline...</div>
+        </div>
+
+        <!-- Radar chart + insight -->
+        <div id="cat-radar-section" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;">
+            <div style="position:relative; max-width:420px; margin:0 auto; width:100%;">
+              <canvas id="cat-radar-canvas" width="420" height="380"></canvas>
+            </div>
+            <div>
+              <!-- Key Insight Card -->
+              <div id="cat-insight-card" style="padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:16px;">
+                <div style="display:flex; align-items:flex-start; gap:12px;">
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+                  <div id="cat-insight-text" style="font-size:14px; line-height:1.6;"></div>
+                </div>
+              </div>
+              <!-- Legend -->
+              <div id="cat-legend" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px;"></div>
+              <!-- Summary stats -->
+              <div id="cat-stats" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category detail cards -->
+        <div id="cat-detail-cards" style="display:none; margin-top:24px;">
+          <h4 style="margin:0 0 16px 0; color:#1A2740; font-size:15px; font-weight:600;">Category Breakdown</h4>
+          <div id="cat-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
         </div>
       </div>
     </div>
@@ -4485,6 +4554,297 @@
     }
 
     // ===== QUERY GAP ANALYSIS TAB =====
+    // ─── CATEGORY SCORES TAB ───────────────────────────────────────────────────
+    var categoryInitialized = false;
+    function initCategoryTab() {
+      if (categoryInitialized) return;
+      categoryInitialized = true;
+
+      var CATEGORY_LABELS = {
+        'convenience': 'Convenience',
+        'delivery_options': 'Delivery',
+        'general_discovery': 'Discovery',
+        'loyalty_program': 'Loyalty',
+        'price_comparison': 'Price',
+        'product_availability': 'Product Range',
+        'quality_reputation': 'Quality',
+        'specialty_department': 'Specialty Depts',
+        'store_recommendation': 'Store Recs'
+      };
+      var GROCER_COLORS = {
+        'hy-vee': '#2D8A6E',
+        'walmart': '#0071CE',
+        'aldi': '#00205B',
+        'fareway': '#E31837',
+        'fresh-thyme': '#4CAF50',
+        'schnucks': '#C62828',
+        'kroger': '#E35205',
+        'wegmans': '#1B5E20'
+      };
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'aldi': 'ALDI', 'fareway': 'Fareway',
+        'fresh-thyme': 'Fresh Thyme', 'schnucks': 'Schnucks', 'kroger': 'Kroger', 'wegmans': 'Wegmans'
+      };
+      var EXCLUDED_MARKETS = { 'Rochester, NY': true };
+
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      sb.from('grocer_mentions')
+        .select('grocer_id, visibility_score, mention_type, grocers(slug), query_library(query_category, target_market)')
+        .order('captured_at', { ascending: false })
+        .limit(2000)
+        .then(function(result) {
+          var mentions = result.data || [];
+          processCategoryData(mentions);
+        })
+        .catch(function() {
+          document.getElementById('cat-loading').innerHTML = '<div style="color:#C0392B;">Failed to load category data.</div>';
+        });
+
+      var radarChart = null;
+
+      function processCategoryData(mentions) {
+        document.getElementById('cat-loading').style.display = 'none';
+
+        var grocerMap = {
+          'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
+          'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+          'b1b00000-0000-0000-0000-000000000003': 'schnucks',
+          'b1b00000-0000-0000-0000-000000000004': 'kroger',
+          'b1b00000-0000-0000-0000-000000000005': 'walmart',
+          'b1b00000-0000-0000-0000-000000000006': 'fareway',
+          'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
+          'b1b00000-0000-0000-0000-000000000008': 'aldi',
+        };
+
+        // Build: { market → { category → { grocer → [scores] } } }
+        var allMarkets = {};
+        var data = {};
+        mentions.forEach(function(m) {
+          var gSlug = grocerMap[m.grocer_id] || (m.grocers && m.grocers.slug);
+          var cat = m.query_library && m.query_library.query_category;
+          var market = m.query_library && m.query_library.target_market;
+          if (!gSlug || !cat || !market) return;
+          if (EXCLUDED_MARKETS[market]) return;
+          if (m.mention_type === 'not_mentioned') return;
+
+          allMarkets[market] = true;
+          if (!data[market]) data[market] = {};
+          if (!data[market][cat]) data[market][cat] = {};
+          if (!data[market][cat][gSlug]) data[market][cat][gSlug] = [];
+          data[market][cat][gSlug].push(m.visibility_score || 0);
+        });
+
+        // Also build an 'all' aggregate
+        data['all'] = {};
+        Object.keys(data).forEach(function(mkt) {
+          if (mkt === 'all') return;
+          Object.keys(data[mkt]).forEach(function(cat) {
+            if (!data['all'][cat]) data['all'][cat] = {};
+            Object.keys(data[mkt][cat]).forEach(function(gSlug) {
+              if (!data['all'][cat][gSlug]) data['all'][cat][gSlug] = [];
+              data['all'][cat][gSlug] = data['all'][cat][gSlug].concat(data[mkt][cat][gSlug]);
+            });
+          });
+        });
+
+        // Populate market filter
+        var marketFilter = document.getElementById('cat-market-filter');
+        Object.keys(allMarkets).sort().forEach(function(mkt) {
+          var opt = document.createElement('option');
+          opt.value = mkt;
+          opt.textContent = mkt;
+          marketFilter.appendChild(opt);
+        });
+
+        function avg(arr) { return arr.length ? Math.round(arr.reduce(function(a,b){return a+b;},0) / arr.length) : 0; }
+
+        function renderCategory(marketKey) {
+          var catData = data[marketKey] || {};
+          var categories = Object.keys(CATEGORY_LABELS).filter(function(c) { return catData[c]; });
+
+          // Compute avg scores per grocer per category
+          var grocerScores = {}; // grocer → { cat: avgScore }
+          categories.forEach(function(cat) {
+            Object.keys(catData[cat]).forEach(function(gSlug) {
+              if (!grocerScores[gSlug]) grocerScores[gSlug] = {};
+              grocerScores[gSlug][cat] = avg(catData[cat][gSlug]);
+            });
+          });
+
+          // Get top 4 competitors by overall avg (always include hy-vee)
+          var grocerOverall = {};
+          Object.keys(grocerScores).forEach(function(gSlug) {
+            var vals = Object.values(grocerScores[gSlug]);
+            grocerOverall[gSlug] = avg(vals);
+          });
+          var sortedGrocers = Object.keys(grocerOverall).sort(function(a,b) { return grocerOverall[b] - grocerOverall[a]; });
+          var displayGrocers = ['hy-vee'];
+          sortedGrocers.forEach(function(g) {
+            if (g !== 'hy-vee' && displayGrocers.length < 4) displayGrocers.push(g);
+          });
+
+          // Build radar datasets
+          var labels = categories.map(function(c) { return CATEGORY_LABELS[c] || c; });
+          var datasets = displayGrocers.map(function(gSlug) {
+            var scores = categories.map(function(c) { return (grocerScores[gSlug] && grocerScores[gSlug][c]) || 0; });
+            var isClient = gSlug === 'hy-vee';
+            return {
+              label: GROCER_NAMES[gSlug] || gSlug,
+              data: scores,
+              borderColor: GROCER_COLORS[gSlug] || '#999',
+              backgroundColor: isClient ? 'rgba(45, 138, 110, 0.15)' : 'transparent',
+              borderWidth: isClient ? 3 : 1.5,
+              pointRadius: isClient ? 5 : 3,
+              pointBackgroundColor: GROCER_COLORS[gSlug] || '#999',
+              pointBorderColor: '#fff',
+              pointBorderWidth: isClient ? 2 : 1,
+              order: isClient ? 0 : 1
+            };
+          });
+
+          // Render radar chart
+          document.getElementById('cat-radar-section').style.display = 'block';
+          var ctx = document.getElementById('cat-radar-canvas').getContext('2d');
+          if (radarChart) radarChart.destroy();
+          radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: { labels: labels, datasets: datasets },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              scales: {
+                r: {
+                  beginAtZero: true,
+                  max: 100,
+                  ticks: { stepSize: 25, font: { size: 10 }, backdropColor: 'transparent', color: '#7A7570' },
+                  pointLabels: { font: { size: 12, weight: '600' }, color: '#1A2740' },
+                  grid: { color: 'rgba(208,203,196,0.4)' },
+                  angleLines: { color: 'rgba(208,203,196,0.3)' }
+                }
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw; }
+                  }
+                }
+              }
+            }
+          });
+
+          // Legend
+          var legendEl = document.getElementById('cat-legend');
+          legendEl.innerHTML = displayGrocers.map(function(gSlug) {
+            return '<div style="display:flex; align-items:center; gap:6px;">' +
+              '<div style="width:12px; height:12px; border-radius:50%; background:' + (GROCER_COLORS[gSlug] || '#999') + ';' + (gSlug === 'hy-vee' ? ' box-shadow:0 0 0 2px #fff, 0 0 0 3px #2D8A6E;' : '') + '"></div>' +
+              '<span style="font-size:12px; color:#1A2740; font-weight:' + (gSlug === 'hy-vee' ? '700' : '400') + ';">' + (GROCER_NAMES[gSlug] || gSlug) + '</span></div>';
+          }).join('');
+
+          // Insight card
+          var hvScores = grocerScores['hy-vee'] || {};
+          var strongest = null, weakest = null;
+          categories.forEach(function(c) {
+            var s = hvScores[c] || 0;
+            if (!strongest || s > strongest.score) strongest = { cat: c, score: s };
+            if (!weakest || s < weakest.score) weakest = { cat: c, score: s };
+          });
+          // Find who leads in the weakest category
+          var weakLeader = null;
+          if (weakest) {
+            Object.keys(grocerScores).forEach(function(gSlug) {
+              if (gSlug === 'hy-vee') return;
+              var s = (grocerScores[gSlug] && grocerScores[gSlug][weakest.cat]) || 0;
+              if (!weakLeader || s > weakLeader.score) weakLeader = { grocer: gSlug, score: s };
+            });
+          }
+          var insightHtml = '';
+          if (strongest && weakest) {
+            insightHtml = '<strong>Strongest category:</strong> ' + (CATEGORY_LABELS[strongest.cat]) + ' (' + strongest.score + '/100). ';
+            insightHtml += '<strong>Biggest gap:</strong> ' + (CATEGORY_LABELS[weakest.cat]) + ' (' + weakest.score + '/100)';
+            if (weakLeader) {
+              insightHtml += ' — <strong>' + (GROCER_NAMES[weakLeader.grocer] || weakLeader.grocer) + '</strong> leads at ' + weakLeader.score + '. ';
+              var gap = weakLeader.score - weakest.score;
+              insightHtml += 'Closing this ' + gap + '-point gap is the highest-value category opportunity.';
+            }
+          }
+          document.getElementById('cat-insight-text').innerHTML = insightHtml;
+
+          // Stats
+          var hvAvg = grocerOverall['hy-vee'] || 0;
+          var catAbove50 = categories.filter(function(c) { return (hvScores[c] || 0) >= 50; }).length;
+          var catBelow50 = categories.filter(function(c) { return (hvScores[c] || 0) < 50; }).length;
+          var leadCount = categories.filter(function(c) {
+            var hvS = hvScores[c] || 0;
+            var isTop = true;
+            Object.keys(grocerScores).forEach(function(g) {
+              if (g !== 'hy-vee' && (grocerScores[g][c] || 0) > hvS) isTop = false;
+            });
+            return isTop;
+          }).length;
+          document.getElementById('cat-stats').innerHTML = [
+            { label: 'Hy-Vee Average', value: hvAvg, color: hvAvg >= 60 ? '#2D8A6E' : '#D4782F' },
+            { label: 'Categories Leading', value: leadCount + '/' + categories.length, color: '#2C5282' },
+            { label: 'Above 50', value: catAbove50, color: '#2D8A6E' },
+            { label: 'Below 50', value: catBelow50, color: catBelow50 > 0 ? '#C0392B' : '#7A7570' }
+          ].map(function(s) {
+            return '<div style="background:#F5F2EE; border-radius:8px; padding:12px; text-align:center;">' +
+              '<div style="font-size:11px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">' + s.label + '</div>' +
+              '<div style="font-size:20px; font-weight:700; color:' + s.color + ';">' + s.value + '</div></div>';
+          }).join('');
+
+          // Detail cards
+          document.getElementById('cat-detail-cards').style.display = 'block';
+          var cardsHtml = categories.map(function(cat) {
+            var hvS = hvScores[cat] || 0;
+            var barColor = hvS >= 70 ? '#2D8A6E' : hvS >= 40 ? '#D4782F' : '#C0392B';
+            var rankLabel = hvS >= 70 ? 'Strong' : hvS >= 40 ? 'Moderate' : 'Weak';
+
+            // Top competitor in this category
+            var topComp = null;
+            Object.keys(grocerScores).forEach(function(g) {
+              if (g === 'hy-vee') return;
+              var s = (grocerScores[g] && grocerScores[g][cat]) || 0;
+              if (!topComp || s > topComp.score) topComp = { grocer: g, score: s };
+            });
+
+            var compLine = '';
+            if (topComp) {
+              var diff = hvS - topComp.score;
+              var diffLabel = diff > 0 ? '<span style="color:#2D8A6E;">+' + diff + ' ahead</span>' :
+                diff < 0 ? '<span style="color:#C0392B;">' + diff + ' behind</span>' : '<span style="color:#7A7570;">tied</span>';
+              compLine = '<div style="font-size:12px; color:#7A7570; margin-top:6px;">vs. ' +
+                '<strong>' + (GROCER_NAMES[topComp.grocer] || topComp.grocer) + '</strong> (' + topComp.score + ') — ' + diffLabel + '</div>';
+            }
+
+            var queryCount = catData[cat] && catData[cat]['hy-vee'] ? catData[cat]['hy-vee'].length : 0;
+
+            return '<div style="padding:14px 16px; background:#fff; border:1px solid #D0CBC4; border-radius:10px;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+              '<div style="font-size:14px; font-weight:600; color:#1A2740;">' + (CATEGORY_LABELS[cat] || cat) + '</div>' +
+              '<span style="padding:2px 8px; background:' + barColor + '18; color:' + barColor + '; border-radius:4px; font-size:11px; font-weight:600;">' + rankLabel + '</span>' +
+              '</div>' +
+              '<div style="font-size:24px; font-weight:700; color:' + barColor + ';">' + hvS + '<span style="font-size:13px; font-weight:400; color:#7A7570;">/100</span></div>' +
+              '<div style="height:6px; background:#E8E3DD; border-radius:3px; margin-top:8px; overflow:hidden;">' +
+              '<div style="height:100%; width:' + hvS + '%; background:' + barColor + '; border-radius:3px;"></div></div>' +
+              compLine +
+              '<div style="font-size:11px; color:#A09A94; margin-top:6px;">' + queryCount + ' data points</div>' +
+              '</div>';
+          }).join('');
+
+          document.getElementById('cat-cards-grid').innerHTML = cardsHtml;
+        }
+
+        // Initial render
+        renderCategory('all');
+
+        // Market filter handler
+        document.getElementById('cat-market-filter').addEventListener('change', function() {
+          renderCategory(this.value);
+        });
+      }
+    }
+
     var queryGapInitialized = false;
 
     function initQueryGapTab() {
@@ -4744,7 +5104,7 @@
 
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries'],
+      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries', 'categories'],
       act: ['recommendations', 'querygap', 'simulator', 'roi', 'storemap'],
       admin: ['pipeline']
     };
@@ -4769,6 +5129,7 @@
       else if (tabName === 'trends') initTrendsTab();
       else if (tabName === 'alerts') initAlertsTab();
       else if (tabName === 'querygap') initQueryGapTab();
+      else if (tabName === 'categories') initCategoryTab();
     }
 
     function activateGroup(groupName) {
@@ -5264,11 +5625,128 @@
     })();
 
     // ===== INITIAL LOAD =====
+    function initOverviewCategoryRadar() {
+      var CATEGORY_LABELS = {
+        'convenience': 'Convenience', 'delivery_options': 'Delivery', 'general_discovery': 'Discovery',
+        'loyalty_program': 'Loyalty', 'price_comparison': 'Price', 'product_availability': 'Product Range',
+        'quality_reputation': 'Quality', 'specialty_department': 'Specialty', 'store_recommendation': 'Store Recs'
+      };
+      var GROCER_NAMES = { 'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'aldi': 'ALDI', 'fareway': 'Fareway',
+        'fresh-thyme': 'Fresh Thyme', 'schnucks': 'Schnucks', 'kroger': 'Kroger', 'wegmans': 'Wegmans' };
+      var GROCER_COLORS = { 'hy-vee': '#2D8A6E', 'walmart': '#0071CE', 'aldi': '#00205B', 'fareway': '#E31837',
+        'fresh-thyme': '#4CAF50', 'schnucks': '#C62828', 'kroger': '#E35205', 'wegmans': '#1B5E20' };
+      var grocerMap = {
+        'b1b00000-0000-0000-0000-000000000001': 'hy-vee', 'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+        'b1b00000-0000-0000-0000-000000000003': 'schnucks', 'b1b00000-0000-0000-0000-000000000004': 'kroger',
+        'b1b00000-0000-0000-0000-000000000005': 'walmart', 'b1b00000-0000-0000-0000-000000000006': 'fareway',
+        'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme', 'b1b00000-0000-0000-0000-000000000008': 'aldi'
+      };
+      var EXCLUDED_MARKETS = { 'Rochester, NY': true };
+
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      sb.from('grocer_mentions')
+        .select('grocer_id, visibility_score, mention_type, grocers(slug), query_library(query_category, target_market)')
+        .order('captured_at', { ascending: false })
+        .limit(2000)
+        .then(function(result) {
+          var mentions = result.data || [];
+          var catScores = {}; // { cat: { grocer: [scores] } }
+          mentions.forEach(function(m) {
+            var gSlug = grocerMap[m.grocer_id] || (m.grocers && m.grocers.slug);
+            var cat = m.query_library && m.query_library.query_category;
+            var market = m.query_library && m.query_library.target_market;
+            if (!gSlug || !cat || !market || EXCLUDED_MARKETS[market] || m.mention_type === 'not_mentioned') return;
+            if (!catScores[cat]) catScores[cat] = {};
+            if (!catScores[cat][gSlug]) catScores[cat][gSlug] = [];
+            catScores[cat][gSlug].push(m.visibility_score || 0);
+          });
+
+          function avg(arr) { return arr.length ? Math.round(arr.reduce(function(a,b){return a+b;},0)/arr.length) : 0; }
+
+          var categories = Object.keys(CATEGORY_LABELS).filter(function(c) { return catScores[c]; });
+          var grocerAvgs = {}; // grocer → { cat: avg }
+          categories.forEach(function(c) {
+            Object.keys(catScores[c]).forEach(function(g) {
+              if (!grocerAvgs[g]) grocerAvgs[g] = {};
+              grocerAvgs[g][c] = avg(catScores[c][g]);
+            });
+          });
+
+          // Pick Hy-Vee + top 2 competitors
+          var overall = {};
+          Object.keys(grocerAvgs).forEach(function(g) { overall[g] = avg(Object.values(grocerAvgs[g])); });
+          var sorted = Object.keys(overall).sort(function(a,b){ return overall[b]-overall[a]; });
+          var show = ['hy-vee'];
+          sorted.forEach(function(g) { if (g !== 'hy-vee' && show.length < 3) show.push(g); });
+
+          var labels = categories.map(function(c) { return CATEGORY_LABELS[c]; });
+          var datasets = show.map(function(gSlug) {
+            return {
+              label: GROCER_NAMES[gSlug] || gSlug,
+              data: categories.map(function(c) { return (grocerAvgs[gSlug] && grocerAvgs[gSlug][c]) || 0; }),
+              borderColor: GROCER_COLORS[gSlug] || '#999',
+              backgroundColor: gSlug === 'hy-vee' ? 'rgba(45,138,110,0.12)' : 'transparent',
+              borderWidth: gSlug === 'hy-vee' ? 2.5 : 1.2,
+              pointRadius: gSlug === 'hy-vee' ? 4 : 2,
+              pointBackgroundColor: GROCER_COLORS[gSlug] || '#999'
+            };
+          });
+
+          var ctx = document.getElementById('overview-cat-radar');
+          if (!ctx) return;
+          new Chart(ctx.getContext('2d'), {
+            type: 'radar',
+            data: { labels: labels, datasets: datasets },
+            options: {
+              responsive: true, maintainAspectRatio: true,
+              scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 }, backdropColor: 'transparent', color: '#7A7570' }, pointLabels: { font: { size: 10, weight: '600' }, color: '#1A2740' }, grid: { color: 'rgba(208,203,196,0.4)' }, angleLines: { color: 'rgba(208,203,196,0.3)' } } },
+              plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 12 } }, tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw; } } } }
+            }
+          });
+
+          // Insight text
+          var hvAvgs = grocerAvgs['hy-vee'] || {};
+          var best = null, worst = null;
+          categories.forEach(function(c) {
+            var s = hvAvgs[c] || 0;
+            if (!best || s > best.s) best = { c: c, s: s };
+            if (!worst || s < worst.s) worst = { c: c, s: s };
+          });
+          var insightEl = document.getElementById('overview-cat-insight');
+          if (insightEl && best && worst) {
+            insightEl.innerHTML = 'Hy-Vee leads in <strong>' + CATEGORY_LABELS[best.c] + '</strong> (' + best.s + ') but trails in <strong>' + CATEGORY_LABELS[worst.c] + '</strong> (' + worst.s + '). Click below for the full category-by-category breakdown with competitor comparison.';
+          }
+
+          // Mini stats
+          var hvOverall = overall['hy-vee'] || 0;
+          var leadCount = categories.filter(function(c) {
+            var hs = hvAvgs[c] || 0;
+            var isTop = true;
+            Object.keys(grocerAvgs).forEach(function(g) { if (g !== 'hy-vee' && (grocerAvgs[g][c] || 0) > hs) isTop = false; });
+            return isTop;
+          }).length;
+          var weakCount = categories.filter(function(c) { return (hvAvgs[c] || 0) < 50; }).length;
+          var statsEl = document.getElementById('overview-cat-mini-stats');
+          if (statsEl) {
+            statsEl.innerHTML = [
+              { l: 'Avg Score', v: hvOverall, clr: hvOverall >= 60 ? '#2D8A6E' : '#D4782F' },
+              { l: 'Leading', v: leadCount + '/' + categories.length, clr: '#2C5282' },
+              { l: 'Needs Work', v: weakCount, clr: weakCount > 0 ? '#C0392B' : '#2D8A6E' }
+            ].map(function(s) {
+              return '<div style="background:#F5F2EE; border-radius:8px; padding:10px; text-align:center;">' +
+                '<div style="font-size:10px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px;">' + s.l + '</div>' +
+                '<div style="font-size:18px; font-weight:700; color:' + s.clr + ';">' + s.v + '</div></div>';
+            }).join('');
+          }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', async function() {
       // Load all live data, then render default tab
       await loadLiveData();
       initVisibilityTab();
       tabInitialized.visibility = true;
+      initOverviewCategoryRadar();
     });
   </script>
 </body>
