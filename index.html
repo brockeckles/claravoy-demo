@@ -1448,6 +1448,7 @@
           <button class="nav-sub-btn" data-tab="querygap">Query Gaps <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="simulator">AI Simulator <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="roi">ROI Calculator <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="contentstrategy">Content Strategy <span class="new-badge">New</span></button>
           <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
         </div>
         <div class="nav-sub-group" data-group="admin">
@@ -1493,6 +1494,10 @@
           <div class="feature-item" onclick="switchToTab('categories')">
             <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#11044;</div>
             <div><strong>Category Scores</strong><br><span style="color:#7A7570; font-size:12px;">Radar chart breakdown by department and topic</span></div>
+          </div>
+          <div class="feature-item" onclick="switchToTab('contentstrategy')">
+            <div class="feat-icon" style="background:#F3E8F5; color:#5B4A9E;">&#128221;</div>
+            <div><strong>Content Strategy</strong><br><span style="color:#7A7570; font-size:12px;">AI-generated content briefs to close visibility gaps</span></div>
           </div>
         </div>
       </div>
@@ -2126,6 +2131,41 @@
           <h4 style="margin:0 0 16px 0; color:#1A2740; font-size:15px; font-weight:600;">Category Breakdown</h4>
           <div id="cat-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- TAB: CONTENT STRATEGY ENGINE -->
+    <div id="contentstrategy" class="tab-content">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+          <h3 style="margin:0;">Content Strategy Engine</h3>
+          <select id="cs-priority-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+            <option value="all">All Priorities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+          </select>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Actionable content briefs generated from query gaps and category weaknesses. Each brief targets a specific visibility gap with concrete recommendations for blog posts, FAQ pages, and structured data.</p>
+
+        <!-- Loading state -->
+        <div id="cs-loading" style="text-align:center; padding:40px; color:#7A7570;">
+          <div style="font-size:14px;">Analyzing visibility gaps and generating content briefs...</div>
+        </div>
+
+        <!-- Summary stats -->
+        <div id="cs-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px;"></div>
+
+        <!-- Insight card -->
+        <div id="cs-insight" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:24px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+            <div id="cs-insight-text" style="font-size:14px; line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Content brief cards -->
+        <div id="cs-briefs" style="display:none; grid-template-columns:1fr; gap:14px;"></div>
       </div>
     </div>
 
@@ -4554,6 +4594,353 @@
     }
 
     // ===== QUERY GAP ANALYSIS TAB =====
+    // ─── CONTENT STRATEGY ENGINE TAB ────────────────────────────────────────────
+    var contentStrategyInitialized = false;
+    function initContentStrategyTab() {
+      if (contentStrategyInitialized) return;
+      contentStrategyInitialized = true;
+
+      var CATEGORY_LABELS = {
+        'convenience': 'Convenience & Access',
+        'delivery_options': 'Delivery & Online',
+        'general_discovery': 'General Discovery',
+        'loyalty_program': 'Loyalty Programs',
+        'price_comparison': 'Price & Value',
+        'product_availability': 'Product Range',
+        'quality_reputation': 'Quality & Reputation',
+        'specialty_department': 'Specialty Departments',
+        'store_recommendation': 'Store Recommendations'
+      };
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'aldi': 'ALDI', 'fareway': 'Fareway',
+        'fresh-thyme': 'Fresh Thyme', 'schnucks': 'Schnucks', 'kroger': 'Kroger', 'wegmans': 'Wegmans'
+      };
+      var EXCLUDED_MARKETS = { 'Rochester, NY': true };
+      var grocerMap = {
+        'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
+        'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+        'b1b00000-0000-0000-0000-000000000003': 'schnucks',
+        'b1b00000-0000-0000-0000-000000000004': 'kroger',
+        'b1b00000-0000-0000-0000-000000000005': 'walmart',
+        'b1b00000-0000-0000-0000-000000000006': 'fareway',
+        'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
+        'b1b00000-0000-0000-0000-000000000008': 'aldi',
+      };
+
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      sb.from('grocer_mentions')
+        .select('grocer_id, visibility_score, mention_type, platform_id, grocers(slug), ai_platforms(slug), query_library(query_text, query_category, target_market)')
+        .order('captured_at', { ascending: false })
+        .limit(2000)
+        .then(function(result) {
+          var mentions = result.data || [];
+          generateBriefs(mentions);
+        })
+        .catch(function() {
+          document.getElementById('cs-loading').innerHTML = '<div style="color:#C0392B;">Failed to load data for content strategy generation.</div>';
+        });
+
+      function generateBriefs(mentions) {
+        document.getElementById('cs-loading').style.display = 'none';
+
+        // Build per-query gap analysis and per-category scores
+        var queryGaps = {}; // queryText → { market, category, missingPlatforms[], competitorWins: { grocer: [platforms] } }
+        var catScores = {}; // category → { hy-vee: [scores], other: [scores] }
+        var platformNames = { 'a1a00000-0000-0000-0000-000000000001': 'ChatGPT', 'a1a00000-0000-0000-0000-000000000002': 'Perplexity',
+          'a1a00000-0000-0000-0000-000000000003': 'Google AI', 'a1a00000-0000-0000-0000-000000000004': 'Meta AI', 'a1a00000-0000-0000-0000-000000000005': 'Alexa' };
+
+        // Build query-platform map (same as Query Gaps tab)
+        var qpMap = {}; // queryText|platform → { grocer: mentionType }
+        var qMeta = {}; // queryText → { market, category }
+        var rank = { 'primary_recommendation': 5, 'alternative_option': 4, 'comparison_mention': 3, 'neutral_mention': 2, 'not_mentioned': 1 };
+
+        mentions.forEach(function(m) {
+          var gSlug = grocerMap[m.grocer_id] || (m.grocers && m.grocers.slug);
+          var pId = m.platform_id;
+          var qText = m.query_library && m.query_library.query_text;
+          var market = m.query_library && m.query_library.target_market;
+          var cat = m.query_library && m.query_library.query_category;
+          if (!gSlug || !pId || !qText || !market || !cat) return;
+          if (EXCLUDED_MARKETS[market]) return;
+
+          var key = qText + '|' + pId;
+          if (!qpMap[key]) qpMap[key] = {};
+          var existing = qpMap[key][gSlug];
+          var nr = rank[m.mention_type] || 0;
+          var er = existing ? (rank[existing] || 0) : 0;
+          if (nr > er) qpMap[key][gSlug] = m.mention_type;
+
+          if (!qMeta[qText]) qMeta[qText] = { market: market, category: cat };
+
+          // Category scores for Hy-Vee
+          if (m.mention_type !== 'not_mentioned') {
+            if (!catScores[cat]) catScores[cat] = {};
+            if (!catScores[cat][gSlug]) catScores[cat][gSlug] = [];
+            catScores[cat][gSlug].push(m.visibility_score || 0);
+          }
+        });
+
+        function avg(arr) { return arr.length ? Math.round(arr.reduce(function(a,b){return a+b;},0)/arr.length) : 0; }
+
+        // Find gaps per query
+        var platforms = Object.keys(platformNames);
+        var allQueries = Object.keys(qMeta);
+        var gaps = [];
+
+        allQueries.forEach(function(qText) {
+          var meta = qMeta[qText];
+          var missing = [];
+          var compWins = {};
+
+          platforms.forEach(function(pId) {
+            var key = qText + '|' + pId;
+            var data = qpMap[key];
+            if (!data) return;
+            var hvStatus = data['hy-vee'];
+            var hvPresent = hvStatus && hvStatus !== 'not_mentioned';
+            if (!hvPresent) {
+              missing.push(pId);
+              Object.keys(data).forEach(function(g) {
+                if (g !== 'hy-vee' && (data[g] === 'primary_recommendation' || data[g] === 'alternative_option')) {
+                  if (!compWins[g]) compWins[g] = [];
+                  compWins[g].push(pId);
+                }
+              });
+            }
+          });
+
+          if (missing.length > 0) {
+            gaps.push({ query: qText, market: meta.market, category: meta.category, missingPlatforms: missing, competitors: compWins });
+          }
+        });
+
+        // Generate content briefs from gaps, grouped by category
+        var briefsByCategory = {};
+        gaps.forEach(function(gap) {
+          var cat = gap.category;
+          if (!briefsByCategory[cat]) briefsByCategory[cat] = { gaps: [], totalMissing: 0 };
+          briefsByCategory[cat].gaps.push(gap);
+          briefsByCategory[cat].totalMissing += gap.missingPlatforms.length;
+        });
+
+        // Build briefs — one per category with gap data
+        var CONTENT_TEMPLATES = {
+          'convenience': {
+            topics: ['Store hours and late-night shopping options', 'Pharmacy services, wait times, and prescription transfer', 'In-store pickup and curbside order process', 'Mobile app features for quick shopping trips'],
+            structuredData: ['LocalBusiness schema with openingHours', 'Pharmacy service schema with wait time estimates', 'FAQ schema for "how does curbside pickup work"'],
+            icon: '&#9201;'
+          },
+          'delivery_options': {
+            topics: ['Same-day delivery coverage areas and fees', 'Aisles Online ordering walkthrough and tips', 'Grocery delivery comparison: speed, minimums, and freshness', 'Holiday and peak-season delivery planning'],
+            structuredData: ['DeliveryService schema with area coverage', 'FAQ schema for delivery policies', 'HowTo schema for placing online orders'],
+            icon: '&#128666;'
+          },
+          'general_discovery': {
+            topics: ['What makes Hy-Vee different from other grocery chains', 'Hy-Vee store experience guide for first-time shoppers', 'Community involvement and local partnerships', 'History and growth of Hy-Vee in the Midwest'],
+            structuredData: ['Organization schema with description and founding', 'LocalBusiness schema per store location', 'Review aggregate schema'],
+            icon: '&#127758;'
+          },
+          'loyalty_program': {
+            topics: ['Complete guide to Hy-Vee Fuel Saver + Perks', 'How to maximize fuel points and digital coupons', 'Loyalty program comparison: Hy-Vee vs. competitors', 'Seasonal bonus points events and promotions'],
+            structuredData: ['FAQ schema for loyalty program questions', 'HowTo schema for signing up and earning points', 'Offer schema for current promotions'],
+            icon: '&#127380;'
+          },
+          'price_comparison': {
+            topics: ['Hy-Vee price match policy and weekly ad highlights', 'Budget grocery shopping tips at Hy-Vee', 'Store brand vs. name brand value comparison', 'Seasonal savings guide: when to stock up on staples'],
+            structuredData: ['FAQ schema for pricing and price match policies', 'Offer schema for weekly deals', 'Product schema with price ranges for key categories'],
+            icon: '&#128181;'
+          },
+          'product_availability': {
+            topics: ['Guide to Hy-Vee local and regional product sourcing', 'International and specialty foods available at Hy-Vee', 'Seasonal product availability calendar', 'How to request special orders and hard-to-find items'],
+            structuredData: ['Product schema for specialty and local items', 'FAQ schema for product availability questions', 'ItemList schema for seasonal collections'],
+            icon: '&#128230;'
+          },
+          'quality_reputation': {
+            topics: ['Hy-Vee produce sourcing and freshness standards', 'Organic and natural product selection overview', 'Quality control practices from farm to shelf', 'Customer satisfaction and awards'],
+            structuredData: ['Review aggregate schema', 'FAQ schema for quality and sourcing questions', 'Organization schema with awards and certifications'],
+            icon: '&#11088;'
+          },
+          'specialty_department': {
+            topics: ['Inside Hy-Vee bakery: custom cakes, fresh bread, and daily specials', 'Hy-Vee deli and prepared foods menu guide', 'Fresh seafood counter: sourcing, selection, and ordering tips', 'Hy-Vee meat department: cuts, grading, and butcher services'],
+            structuredData: ['Menu schema for deli and prepared foods', 'FAQ schema for custom cake ordering', 'Product schema for specialty department items', 'LocalBusiness schema with department descriptions'],
+            icon: '&#127860;'
+          },
+          'store_recommendation': {
+            topics: ['Why shoppers choose Hy-Vee: a data-driven look', 'Hy-Vee store format guide: traditional vs. FAST vs. Dollar Fresh', 'What to expect at a Hy-Vee store: departments and services', 'Hy-Vee vs. competitors: honest comparison for Midwest shoppers'],
+            structuredData: ['LocalBusiness schema with full department list', 'FAQ schema for new shoppers', 'AggregateRating schema from review platforms'],
+            icon: '&#127963;'
+          }
+        };
+
+        var briefs = [];
+        Object.keys(CONTENT_TEMPLATES).forEach(function(cat) {
+          var catLabel = CATEGORY_LABELS[cat] || cat;
+          var gapData = briefsByCategory[cat];
+          var hvScore = catScores[cat] && catScores[cat]['hy-vee'] ? avg(catScores[cat]['hy-vee']) : null;
+          var template = CONTENT_TEMPLATES[cat];
+
+          // Find top competitor in this category
+          var topComp = null;
+          if (catScores[cat]) {
+            Object.keys(catScores[cat]).forEach(function(g) {
+              if (g === 'hy-vee') return;
+              var s = avg(catScores[cat][g]);
+              if (!topComp || s > topComp.score) topComp = { grocer: g, score: s };
+            });
+          }
+
+          var priority = 'medium';
+          var priorityReason = '';
+          if (gapData && gapData.totalMissing >= 5) {
+            priority = 'critical';
+            priorityReason = gapData.gaps.length + ' queries with ' + gapData.totalMissing + ' platform misses';
+          } else if (gapData && gapData.totalMissing >= 2) {
+            priority = 'high';
+            priorityReason = gapData.gaps.length + ' queries with visibility gaps';
+          } else if (hvScore !== null && hvScore < 60) {
+            priority = 'high';
+            priorityReason = 'Category score ' + hvScore + '/100 — below competitive threshold';
+          } else if (topComp && hvScore !== null && topComp.score > hvScore) {
+            priority = 'medium';
+            priorityReason = (GROCER_NAMES[topComp.grocer] || topComp.grocer) + ' leads by ' + (topComp.score - hvScore) + ' points';
+          } else {
+            priorityReason = 'Maintain strong position';
+          }
+
+          // Build specific gap queries for this category
+          var gapQueries = gapData ? gapData.gaps.map(function(g) {
+            return '"' + g.query + '" (' + g.market + ') — missing on ' + g.missingPlatforms.map(function(p) { return platformNames[p] || p; }).join(', ');
+          }) : [];
+
+          briefs.push({
+            category: cat,
+            categoryLabel: catLabel,
+            icon: template.icon,
+            priority: priority,
+            priorityReason: priorityReason,
+            hvScore: hvScore,
+            topCompetitor: topComp,
+            topics: template.topics,
+            structuredData: template.structuredData,
+            gapQueries: gapQueries.slice(0, 3),
+            gapCount: gapData ? gapData.gaps.length : 0,
+            missingCount: gapData ? gapData.totalMissing : 0
+          });
+        });
+
+        // Sort by priority
+        var prioOrder = { critical: 0, high: 1, medium: 2 };
+        briefs.sort(function(a,b) { return (prioOrder[a.priority] || 9) - (prioOrder[b.priority] || 9); });
+
+        // Stats
+        var critical = briefs.filter(function(b) { return b.priority === 'critical'; }).length;
+        var high = briefs.filter(function(b) { return b.priority === 'high'; }).length;
+        var totalTopics = briefs.reduce(function(sum, b) { return sum + b.topics.length; }, 0);
+        var totalGaps = briefs.reduce(function(sum, b) { return sum + b.gapCount; }, 0);
+
+        document.getElementById('cs-stats').style.display = 'grid';
+        document.getElementById('cs-stats').innerHTML = [
+          { label: 'Content Briefs', value: briefs.length, color: '#2C5282' },
+          { label: 'Critical Priority', value: critical, color: critical > 0 ? '#C0392B' : '#7A7570' },
+          { label: 'High Priority', value: high, color: high > 0 ? '#D4782F' : '#7A7570' },
+          { label: 'Topic Ideas', value: totalTopics, color: '#2D8A6E' }
+        ].map(function(s) {
+          return '<div style="background:#F5F2EE; border-radius:10px; padding:16px; text-align:center;">' +
+            '<div style="font-size:11px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">' + s.label + '</div>' +
+            '<div style="font-size:22px; font-weight:700; color:' + s.color + ';">' + s.value + '</div></div>';
+        }).join('');
+
+        // Insight
+        document.getElementById('cs-insight').style.display = 'block';
+        var topBrief = briefs[0];
+        var insightText = '<strong>' + briefs.length + ' content briefs</strong> generated from AI visibility analysis. ';
+        if (topBrief && topBrief.priority === 'critical') {
+          insightText += 'Top priority: <strong>' + topBrief.categoryLabel + '</strong> — ' + topBrief.priorityReason + '. ';
+        }
+        insightText += 'Implementing these content recommendations could close visibility gaps across ' + totalGaps + ' query-platform combinations.';
+        document.getElementById('cs-insight-text').innerHTML = insightText;
+
+        // Render brief cards
+        function renderBriefs(filterPriority) {
+          var filtered = filterPriority === 'all' ? briefs : briefs.filter(function(b) { return b.priority === filterPriority; });
+
+          var prioStyles = {
+            critical: { bg: '#C0392B10', border: '#C0392B', label: 'Critical', labelBg: '#C0392B' },
+            high: { bg: '#D4782F10', border: '#D4782F', label: 'High', labelBg: '#D4782F' },
+            medium: { bg: '#F5F2EE', border: '#D0CBC4', label: 'Medium', labelBg: '#7A7570' }
+          };
+
+          document.getElementById('cs-briefs').style.display = 'grid';
+          document.getElementById('cs-briefs').innerHTML = filtered.map(function(brief) {
+            var s = prioStyles[brief.priority];
+
+            var scoreHtml = '';
+            if (brief.hvScore !== null) {
+              var barColor = brief.hvScore >= 70 ? '#2D8A6E' : brief.hvScore >= 40 ? '#D4782F' : '#C0392B';
+              scoreHtml = '<div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">' +
+                '<div style="font-size:12px; color:#7A7570; width:80px;">Hy-Vee Score</div>' +
+                '<div style="flex:1; height:6px; background:#E8E3DD; border-radius:3px; overflow:hidden;">' +
+                '<div style="height:100%; width:' + brief.hvScore + '%; background:' + barColor + '; border-radius:3px;"></div></div>' +
+                '<div style="font-size:13px; font-weight:600; color:' + barColor + '; width:40px; text-align:right;">' + brief.hvScore + '</div></div>';
+              if (brief.topCompetitor) {
+                var compColor = brief.topCompetitor.score >= 70 ? '#2D8A6E' : brief.topCompetitor.score >= 40 ? '#D4782F' : '#C0392B';
+                scoreHtml += '<div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">' +
+                  '<div style="font-size:12px; color:#7A7570; width:80px;">' + (GROCER_NAMES[brief.topCompetitor.grocer] || brief.topCompetitor.grocer) + '</div>' +
+                  '<div style="flex:1; height:6px; background:#E8E3DD; border-radius:3px; overflow:hidden;">' +
+                  '<div style="height:100%; width:' + brief.topCompetitor.score + '%; background:' + compColor + '; border-radius:3px; opacity:0.5;"></div></div>' +
+                  '<div style="font-size:13px; font-weight:600; color:' + compColor + '; width:40px; text-align:right;">' + brief.topCompetitor.score + '</div></div>';
+              }
+            }
+
+            var topicsHtml = '<div style="margin-bottom:14px;">' +
+              '<div style="font-size:12px; font-weight:600; color:#1A2740; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Recommended Content Topics</div>' +
+              brief.topics.map(function(t, i) {
+                return '<div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid #F0EDE8;">' +
+                  '<span style="color:#2D8A6E; font-weight:600; font-size:12px; min-width:20px;">' + (i + 1) + '.</span>' +
+                  '<span style="font-size:13px; color:#1A2740;">' + t + '</span></div>';
+              }).join('') + '</div>';
+
+            var sdHtml = '<div style="margin-bottom:14px;">' +
+              '<div style="font-size:12px; font-weight:600; color:#1A2740; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Structured Data Opportunities</div>' +
+              brief.structuredData.map(function(sd) {
+                return '<div style="display:flex; align-items:center; gap:6px; padding:4px 0;">' +
+                  '<span style="color:#5B4A9E; font-size:11px;">&#9670;</span>' +
+                  '<span style="font-size:12px; color:#5A5550;">' + sd + '</span></div>';
+              }).join('') + '</div>';
+
+            var gapHtml = '';
+            if (brief.gapQueries.length > 0) {
+              gapHtml = '<div>' +
+                '<div style="font-size:12px; font-weight:600; color:#1A2740; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Specific Gaps to Address</div>' +
+                brief.gapQueries.map(function(q) {
+                  return '<div style="font-size:12px; color:#7A7570; padding:4px 0; border-bottom:1px solid #F0EDE8;">' + q + '</div>';
+                }).join('') + '</div>';
+            }
+
+            return '<div style="padding:20px; background:' + s.bg + '; border-left:4px solid ' + s.border + '; border-radius:10px;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px;">' +
+              '<div style="display:flex; align-items:center; gap:10px;">' +
+              '<span style="font-size:22px;">' + brief.icon + '</span>' +
+              '<div><div style="font-size:16px; font-weight:700; color:#1A2740;">' + brief.categoryLabel + '</div>' +
+              '<div style="font-size:12px; color:#7A7570;">' + brief.priorityReason + '</div></div></div>' +
+              '<span style="padding:3px 10px; background:' + s.labelBg + '; color:#fff; border-radius:4px; font-size:11px; font-weight:600;">' + s.label + '</span>' +
+              '</div>' +
+              scoreHtml +
+              topicsHtml +
+              sdHtml +
+              gapHtml +
+              '</div>';
+          }).join('');
+        }
+
+        renderBriefs('all');
+
+        document.getElementById('cs-priority-filter').addEventListener('change', function() {
+          renderBriefs(this.value);
+        });
+      }
+    }
+
     // ─── CATEGORY SCORES TAB ───────────────────────────────────────────────────
     var categoryInitialized = false;
     function initCategoryTab() {
@@ -5105,7 +5492,7 @@
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
       monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries', 'categories'],
-      act: ['recommendations', 'querygap', 'simulator', 'roi', 'storemap'],
+      act: ['recommendations', 'querygap', 'contentstrategy', 'simulator', 'roi', 'storemap'],
       admin: ['pipeline']
     };
 
@@ -5130,6 +5517,7 @@
       else if (tabName === 'alerts') initAlertsTab();
       else if (tabName === 'querygap') initQueryGapTab();
       else if (tabName === 'categories') initCategoryTab();
+      else if (tabName === 'contentstrategy') initContentStrategyTab();
     }
 
     function activateGroup(groupName) {
