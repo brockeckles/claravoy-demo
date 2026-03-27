@@ -1371,6 +1371,7 @@
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
+          <button class="nav-sub-btn" data-tab="querygap">Query Gaps</button>
           <button class="nav-sub-btn" data-tab="simulator">AI Simulator</button>
           <button class="nav-sub-btn" data-tab="roi">ROI Calculator</button>
         </div>
@@ -1951,6 +1952,38 @@
           <div class="card-title">Visibility Summary</div>
           <div id="sim-summary-content"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- TAB: QUERY GAP ANALYSIS -->
+    <div id="querygap" class="tab-content">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+          <h3 style="margin:0;">Query Gap Analysis</h3>
+          <select id="gap-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+            <option value="all">All Markets</option>
+          </select>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Queries where competitors appear but Hy-Vee doesn't — or where Hy-Vee ranks behind. These are the highest-value content opportunities.</p>
+
+        <!-- Loading state -->
+        <div id="gap-loading" style="text-align:center; padding:40px; color:#7A7570;">
+          <div style="font-size:14px;">Loading query data from pipeline...</div>
+        </div>
+
+        <!-- Summary stats -->
+        <div id="gap-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px;"></div>
+
+        <!-- Headline insight -->
+        <div id="gap-headline" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:24px;">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+            <div id="gap-headline-text" style="font-size:14px; line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Gap cards -->
+        <div id="gap-cards" style="display:none; grid-template-columns:1fr; gap:12px;"></div>
       </div>
     </div>
 
@@ -4345,10 +4378,264 @@
       }).join('');
     }
 
+    // ===== QUERY GAP ANALYSIS TAB =====
+    var queryGapInitialized = false;
+
+    function initQueryGapTab() {
+      if (queryGapInitialized) return;
+      queryGapInitialized = true;
+
+      var GROCER_NAMES = {
+        'hy-vee': 'Hy-Vee', 'walmart': 'Walmart', 'fareway': 'Fareway',
+        'aldi': 'ALDI', 'fresh-thyme': 'Fresh Thyme', 'kroger': 'Kroger',
+        'wegmans': 'Wegmans', 'schnucks': 'Schnucks'
+      };
+      var PLATFORM_NAMES = {
+        'chatgpt': 'ChatGPT', 'perplexity': 'Perplexity',
+        'google-ai': 'Google AI', 'meta-ai': 'Meta AI', 'alexa': 'Alexa'
+      };
+
+      // Fetch mention data from Supabase
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      sb.from('grocer_mentions')
+        .select('mention_type, position_rank, grocer_id, platform_id, query_id, grocers(slug), ai_platforms(slug), query_library(query_text, target_market)')
+        .order('captured_at', { ascending: false })
+        .limit(2000)
+        .then(function(result) {
+          var mentions = result.data || [];
+          processGapData(mentions);
+        })
+        .catch(function() {
+          document.getElementById('gap-loading').innerHTML = '<div style="color:#C0392B;">Failed to load query data. Check pipeline status.</div>';
+        });
+
+      function processGapData(mentions) {
+        document.getElementById('gap-loading').style.display = 'none';
+
+        var grocerMap = {
+          'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
+          'b1b00000-0000-0000-0000-000000000002': 'wegmans',
+          'b1b00000-0000-0000-0000-000000000003': 'schnucks',
+          'b1b00000-0000-0000-0000-000000000004': 'kroger',
+          'b1b00000-0000-0000-0000-000000000005': 'walmart',
+          'b1b00000-0000-0000-0000-000000000006': 'fareway',
+          'b1b00000-0000-0000-0000-000000000007': 'fresh-thyme',
+          'b1b00000-0000-0000-0000-000000000008': 'aldi',
+        };
+        var platformMap = {
+          'a1a00000-0000-0000-0000-000000000001': 'chatgpt',
+          'a1a00000-0000-0000-0000-000000000002': 'perplexity',
+          'a1a00000-0000-0000-0000-000000000003': 'google-ai',
+          'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
+          'a1a00000-0000-0000-0000-000000000005': 'alexa',
+        };
+
+        // Build per-query, per-platform mention map
+        // Key: queryText|platform → { grocerSlug: mentionType }
+        var queryPlatformMap = {};
+        var queryMeta = {}; // queryText → { market, text }
+        var allMarkets = {};
+
+        mentions.forEach(function(m) {
+          var gSlug = grocerMap[m.grocer_id] || (m.grocers && m.grocers.slug);
+          var pSlug = platformMap[m.platform_id] || (m.ai_platforms && m.ai_platforms.slug);
+          var qText = m.query_library && m.query_library.query_text;
+          var market = m.query_library && m.query_library.target_market;
+          if (!gSlug || !pSlug || !qText) return;
+
+          var key = qText + '|' + pSlug;
+          if (!queryPlatformMap[key]) queryPlatformMap[key] = {};
+          // Keep best mention type per grocer (primary > alternative > comparison > neutral > not_mentioned)
+          var rank = { 'primary_recommendation': 5, 'alternative_option': 4, 'comparison_mention': 3, 'neutral_mention': 2, 'not_mentioned': 1 };
+          var existing = queryPlatformMap[key][gSlug];
+          var newRank = rank[m.mention_type] || 0;
+          var existingRank = existing ? (rank[existing] || 0) : 0;
+          if (newRank > existingRank) {
+            queryPlatformMap[key][gSlug] = m.mention_type;
+          }
+
+          if (!queryMeta[qText]) queryMeta[qText] = { market: market, text: qText };
+          if (market) allMarkets[market] = true;
+        });
+
+        // Populate market filter
+        var marketFilter = document.getElementById('gap-market-filter');
+        Object.keys(allMarkets).sort().forEach(function(mkt) {
+          var opt = document.createElement('option');
+          opt.value = mkt;
+          opt.textContent = mkt;
+          marketFilter.appendChild(opt);
+        });
+
+        // Analyze gaps: for each query+platform, find where Hy-Vee is absent/weak but competitors appear
+        var allQueries = Object.keys(queryMeta);
+        var platforms = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai', 'alexa'];
+
+        function buildGapCards(marketFilterValue) {
+          var gaps = [];
+
+          allQueries.forEach(function(qText) {
+            var meta = queryMeta[qText];
+            if (marketFilterValue !== 'all' && meta.market !== marketFilterValue) return;
+
+            var hvMissing = []; // platforms where Hy-Vee not mentioned
+            var hvWeak = []; // platforms where Hy-Vee is mentioned but not primary
+            var competitorsWinning = {}; // grocer → [platforms they're primary on]
+
+            platforms.forEach(function(pSlug) {
+              var key = qText + '|' + pSlug;
+              var data = queryPlatformMap[key];
+              if (!data) return;
+
+              var hvStatus = data['hy-vee'];
+              var hvPresent = hvStatus && hvStatus !== 'not_mentioned';
+              var hvPrimary = hvStatus === 'primary_recommendation';
+
+              if (!hvPresent) {
+                hvMissing.push(pSlug);
+              } else if (!hvPrimary) {
+                hvWeak.push(pSlug);
+              }
+
+              // Find who IS winning on this platform
+              Object.keys(data).forEach(function(gSlug) {
+                if (gSlug === 'hy-vee') return;
+                if (data[gSlug] === 'primary_recommendation' || data[gSlug] === 'alternative_option') {
+                  if (!competitorsWinning[gSlug]) competitorsWinning[gSlug] = [];
+                  if (competitorsWinning[gSlug].indexOf(pSlug) < 0) competitorsWinning[gSlug].push(pSlug);
+                }
+              });
+            });
+
+            if (hvMissing.length > 0 || hvWeak.length > 0) {
+              var severity = hvMissing.length >= 3 ? 'critical' : hvMissing.length >= 1 ? 'high' : 'medium';
+              gaps.push({
+                query: qText,
+                market: meta.market,
+                severity: severity,
+                missingPlatforms: hvMissing,
+                weakPlatforms: hvWeak,
+                competitors: competitorsWinning
+              });
+            }
+          });
+
+          // Sort: critical first, then high, then medium
+          var sevOrder = { critical: 0, high: 1, medium: 2 };
+          gaps.sort(function(a, b) {
+            return (sevOrder[a.severity] || 9) - (sevOrder[b.severity] || 9);
+          });
+
+          return gaps;
+        }
+
+        function renderGaps(gaps) {
+          // Stats
+          var statsEl = document.getElementById('gap-stats');
+          var cardsEl = document.getElementById('gap-cards');
+          var headlineEl = document.getElementById('gap-headline');
+
+          var critical = gaps.filter(function(g) { return g.severity === 'critical'; }).length;
+          var high = gaps.filter(function(g) { return g.severity === 'high'; }).length;
+          var medium = gaps.filter(function(g) { return g.severity === 'medium'; }).length;
+          var totalMissing = gaps.reduce(function(sum, g) { return sum + g.missingPlatforms.length; }, 0);
+
+          statsEl.style.display = 'grid';
+          statsEl.innerHTML = [
+            { label: 'Queries with Gaps', value: gaps.length, color: gaps.length > 0 ? '#C0392B' : '#2D8A6E' },
+            { label: 'Critical Gaps', value: critical, color: critical > 0 ? '#C0392B' : '#7A7570' },
+            { label: 'High Priority', value: high, color: high > 0 ? '#D4782F' : '#7A7570' },
+            { label: 'Platform Misses', value: totalMissing, color: '#1A2740' }
+          ].map(function(c) {
+            return '<div style="background:#F5F2EE; border-radius:10px; padding:16px; text-align:center;">' +
+              '<div style="font-size:11px; color:#7A7570; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">' + c.label + '</div>' +
+              '<div style="font-size:22px; font-weight:700; color:' + c.color + ';">' + c.value + '</div></div>';
+          }).join('');
+
+          // Headline
+          headlineEl.style.display = 'block';
+          var headlineText = document.getElementById('gap-headline-text');
+          if (gaps.length === 0) {
+            headlineText.innerHTML = 'No query gaps found — Hy-Vee appears across all tracked queries and platforms. Strong coverage.';
+          } else {
+            var topCompetitors = {};
+            gaps.forEach(function(g) {
+              Object.keys(g.competitors).forEach(function(slug) {
+                if (!topCompetitors[slug]) topCompetitors[slug] = 0;
+                topCompetitors[slug] += g.competitors[slug].length;
+              });
+            });
+            var topComp = Object.keys(topCompetitors).sort(function(a, b) { return topCompetitors[b] - topCompetitors[a]; });
+            var topName = topComp.length > 0 ? (GROCER_NAMES[topComp[0]] || topComp[0]) : 'competitors';
+            headlineText.innerHTML = '<strong>' + gaps.length + ' queries</strong> where Hy-Vee has visibility gaps. ' +
+              '<strong>' + topName + '</strong> is the most frequent winner in these gaps. ' +
+              'Addressing critical gaps first could recover lost consumer traffic.';
+          }
+
+          // Gap cards
+          cardsEl.style.display = 'grid';
+          if (gaps.length === 0) {
+            cardsEl.innerHTML = '<div style="text-align:center; padding:30px; color:#2D8A6E; font-size:14px;">All clear — Hy-Vee appears on every tracked query.</div>';
+            return;
+          }
+
+          var sevStyles = {
+            critical: { bg: '#C0392B10', border: '#C0392B', label: 'Critical', labelBg: '#C0392B' },
+            high: { bg: '#D4782F10', border: '#D4782F', label: 'High', labelBg: '#D4782F' },
+            medium: { bg: '#F5F2EE', border: '#D0CBC4', label: 'Medium', labelBg: '#7A7570' }
+          };
+
+          cardsEl.innerHTML = gaps.map(function(gap) {
+            var s = sevStyles[gap.severity];
+
+            // Missing platforms pills
+            var missingHtml = gap.missingPlatforms.map(function(p) {
+              return '<span style="display:inline-block; padding:3px 10px; background:#C0392B18; color:#C0392B; border-radius:4px; font-size:11px; font-weight:500;">' +
+                (PLATFORM_NAMES[p] || p) + '</span>';
+            }).join(' ');
+
+            // Weak platforms pills
+            var weakHtml = gap.weakPlatforms.map(function(p) {
+              return '<span style="display:inline-block; padding:3px 10px; background:#D4782F18; color:#D4782F; border-radius:4px; font-size:11px; font-weight:500;">' +
+                (PLATFORM_NAMES[p] || p) + '</span>';
+            }).join(' ');
+
+            // Competitors appearing
+            var compHtml = Object.keys(gap.competitors).map(function(slug) {
+              var pList = gap.competitors[slug].map(function(p) { return PLATFORM_NAMES[p] || p; }).join(', ');
+              return '<span style="font-size:12px; color:#1A2740;"><strong>' + (GROCER_NAMES[slug] || slug) + '</strong> <span style="color:#7A7570;">(' + pList + ')</span></span>';
+            }).join(' · ');
+
+            return '<div style="padding:16px 18px; background:' + s.bg + '; border-left:3px solid ' + s.border + '; border-radius:8px;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:8px;">' +
+              '<div style="font-size:14px; font-weight:600; color:#1A2740; flex:1;">"' + gap.query + '"</div>' +
+              '<div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">' +
+              '<span style="padding:3px 8px; background:' + s.labelBg + '; color:#fff; border-radius:4px; font-size:11px; font-weight:600;">' + s.label + '</span>' +
+              '<span style="font-size:12px; color:#7A7570;">' + gap.market + '</span>' +
+              '</div></div>' +
+              (missingHtml ? '<div style="margin-bottom:6px;"><span style="font-size:11px; color:#7A7570; margin-right:6px;">Not mentioned:</span>' + missingHtml + '</div>' : '') +
+              (weakHtml ? '<div style="margin-bottom:6px;"><span style="font-size:11px; color:#7A7570; margin-right:6px;">Not primary:</span>' + weakHtml + '</div>' : '') +
+              (compHtml ? '<div style="margin-top:6px;"><span style="font-size:11px; color:#7A7570; margin-right:4px;">Competitors appearing:</span>' + compHtml + '</div>' : '') +
+              '</div>';
+          }).join('');
+        }
+
+        // Initial render
+        var initialGaps = buildGapCards('all');
+        renderGaps(initialGaps);
+
+        // Market filter handler
+        document.getElementById('gap-market-filter').addEventListener('change', function() {
+          var gaps = buildGapCards(this.value);
+          renderGaps(gaps);
+        });
+      }
+    }
+
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
       monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries'],
-      act: ['recommendations', 'simulator', 'roi'],
+      act: ['recommendations', 'querygap', 'simulator', 'roi'],
       admin: ['storemap', 'pipeline']
     };
 
@@ -4371,6 +4658,7 @@
       else if (tabName === 'drivers') initDriversTab();
       else if (tabName === 'trends') initTrendsTab();
       else if (tabName === 'alerts') initAlertsTab();
+      else if (tabName === 'querygap') initQueryGapTab();
     }
 
     function activateGroup(groupName) {
