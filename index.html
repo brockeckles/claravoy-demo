@@ -1438,28 +1438,22 @@
       </div>
       <div class="nav-secondary">
         <div class="nav-sub-group" data-group="monitor">
-          <button class="nav-sub-btn" data-tab="visibility">Visibility Score</button>
-          <button class="nav-sub-btn" data-tab="drivers">Visibility Drivers <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="trends">Score Trends <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="alerts">What Changed <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="platforms">Platform Breakdown</button>
-          <button class="nav-sub-btn" data-tab="competitive">Competitive Landscape</button>
-          <button class="nav-sub-btn" data-tab="queries">Query Intelligence</button>
-          <button class="nav-sub-btn" data-tab="categories">Category Scores <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="sentiment">Sentiment <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="visibility">Visibility</button>
+          <button class="nav-sub-btn" data-tab="competitive">Competitive</button>
+          <button class="nav-sub-btn" data-tab="alerts">What Changed</button>
+          <button class="nav-sub-btn" data-tab="categories">Categories</button>
+          <button class="nav-sub-btn" data-tab="queries">Queries</button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
-          <button class="nav-sub-btn" data-tab="querygap">Query Gaps <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="simulator">AI Simulator <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="roi">ROI Calculator <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="contentstrategy">Content Strategy <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="contentstrategy">Content Strategy</button>
+          <button class="nav-sub-btn" data-tab="simulator">AI Simulator</button>
           <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
         </div>
         <div class="nav-sub-group" data-group="insights">
-          <button class="nav-sub-btn" data-tab="cpgbrands">CPG Brand Visibility <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="expansion">Market Expansion <span class="new-badge">New</span></button>
-          <button class="nav-sub-btn" data-tab="roiattribution">ROI Attribution <span class="new-badge">New</span></button>
+          <button class="nav-sub-btn" data-tab="cpgbrands">CPG Brands</button>
+          <button class="nav-sub-btn" data-tab="expansion">Market Expansion</button>
+          <button class="nav-sub-btn" data-tab="roi">ROI & Revenue</button>
         </div>
         <div class="nav-sub-group" data-group="admin">
           <button class="nav-sub-btn" data-tab="pipeline">Pipeline Status</button>
@@ -1473,53 +1467,25 @@
       <!-- What's New Card -->
       <div class="whats-new-card" id="whats-new-card">
         <h4>
-          <span style="font-size:18px;">&#9889;</span> What's New This Week
+          <span style="font-size:18px;">&#9889;</span> Featured Sections
           <button class="whats-new-dismiss" onclick="document.getElementById('whats-new-card').style.display='none'" title="Dismiss">&times;</button>
         </h4>
         <div class="feature-list">
-          <div class="feature-item" onclick="switchToTab('drivers')">
-            <div class="feat-icon" style="background:#E8F4E8; color:#2E7D32;">&#9776;</div>
-            <div><strong>Visibility Drivers</strong><br><span style="color:#7A7570; font-size:12px;">See WHY each grocer scores the way they do</span></div>
+          <div class="feature-item" onclick="activateGroup('monitor'); switchToTab('visibility')">
+            <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#128200;</div>
+            <div><strong>Visibility Dashboard</strong><br><span style="color:#7A7570; font-size:12px;">Score trends, drivers, platform breakdown — all in one view</span></div>
           </div>
-          <div class="feature-item" onclick="switchToTab('trends')">
-            <div class="feat-icon" style="background:#E3F2FD; color:#1565C0;">&#128200;</div>
-            <div><strong>Score Trends</strong><br><span style="color:#7A7570; font-size:12px;">14-day trend charts with competitor comparison</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('alerts')">
-            <div class="feat-icon" style="background:#FFF3E0; color:#E65100;">&#128276;</div>
-            <div><strong>What Changed</strong><br><span style="color:#7A7570; font-size:12px;">Auto-generated weekly change alerts</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('querygap')">
-            <div class="feat-icon" style="background:#FCE4EC; color:#C62828;">&#128269;</div>
-            <div><strong>Query Gaps</strong><br><span style="color:#7A7570; font-size:12px;">Find where competitors appear but Hy-Vee doesn't</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('simulator')">
-            <div class="feat-icon" style="background:#F3E5F5; color:#7B1FA2;">&#129302;</div>
-            <div><strong>AI Simulator</strong><br><span style="color:#7A7570; font-size:12px;">See how AI platforms respond to grocery queries</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('roi')">
-            <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128176;</div>
-            <div><strong>ROI Calculator</strong><br><span style="color:#7A7570; font-size:12px;">Calculate revenue impact of improved visibility</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('categories')">
+          <div class="feature-item" onclick="activateGroup('monitor'); switchToTab('categories')">
             <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#11044;</div>
-            <div><strong>Category Scores</strong><br><span style="color:#7A7570; font-size:12px;">Radar chart breakdown by department and topic</span></div>
-          </div>
-          <div class="feature-item" onclick="switchToTab('contentstrategy')">
-            <div class="feat-icon" style="background:#F3E8F5; color:#5B4A9E;">&#128221;</div>
-            <div><strong>Content Strategy</strong><br><span style="color:#7A7570; font-size:12px;">AI-generated content briefs to close visibility gaps</span></div>
+            <div><strong>Category Intelligence</strong><br><span style="color:#7A7570; font-size:12px;">Radar breakdown with AI sentiment analysis by department</span></div>
           </div>
           <div class="feature-item" onclick="activateGroup('insights'); switchToTab('cpgbrands')">
             <div class="feat-icon" style="background:#F0EBF5; color:#5B4A9E;">&#127919;</div>
-            <div><strong>CPG Brand Visibility</strong><br><span style="color:#7A7570; font-size:12px;">Track which brands get recommended alongside grocers</span></div>
+            <div><strong>CPG Brand Insights</strong><br><span style="color:#7A7570; font-size:12px;">See which brands AI platforms recommend alongside grocers</span></div>
           </div>
-          <div class="feature-item" onclick="activateGroup('insights'); switchToTab('expansion')">
-            <div class="feat-icon" style="background:#E3EDF5; color:#2C5282;">&#127757;</div>
-            <div><strong>Market Expansion</strong><br><span style="color:#7A7570; font-size:12px;">Find markets with AI demand but no store presence</span></div>
-          </div>
-          <div class="feature-item" onclick="activateGroup('insights'); switchToTab('roiattribution')">
-            <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#128176;</div>
-            <div><strong>ROI Attribution</strong><br><span style="color:#7A7570; font-size:12px;">Connect visibility changes to same-store sales lift</span></div>
+          <div class="feature-item" onclick="activateGroup('insights'); switchToTab('roi')">
+            <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128176;</div>
+            <div><strong>ROI Attribution</strong><br><span style="color:#7A7570; font-size:12px;">Connect visibility improvements to real revenue lift</span></div>
           </div>
         </div>
       </div>
@@ -1540,29 +1506,6 @@
           Understand how your brand appears in the AI platforms consumers are using to make purchasing decisions — and take action to improve it.
         </div>
         <div class="hero-badge">Agentic Commerce Intelligence</div>
-      </div>
-
-      <!-- What Is Claravoy + Why It Matters -->
-      <div class="overview-grid">
-        <div class="overview-section">
-          <h3><span class="section-icon" style="background:#E8F0FE; color:#2C5282;">◎</span> What Is Claravoy?</h3>
-          <p>
-            Claravoy is an automated monitoring platform that tracks how grocery chains appear across AI-powered search and recommendation engines. As consumers increasingly rely on tools like ChatGPT, Google AI Overview, and Perplexity to guide their shopping decisions, <span class="highlight-text">retailers who aren't visible in these AI responses are losing customers they never knew existed</span>.
-          </p>
-          <p>
-            Our agentic pipeline queries AI platforms daily using real consumer language, analyzes the responses for grocer mentions, and computes a proprietary Visibility Score for each market. The result is a real-time intelligence layer that shows exactly where a retailer stands — and where they're being overlooked.
-          </p>
-        </div>
-
-        <div class="overview-section">
-          <h3><span class="section-icon" style="background:#E8F5F0; color:#2D8A6E;">▲</span> Why It Matters Now</h3>
-          <p>
-            AI commerce is not a future concern — it's already reshaping how consumers discover grocery options. When someone asks ChatGPT <em>"What's the best grocery store near me for organic produce?"</em> and your chain isn't mentioned, that's a lost conversion with zero traditional marketing signal.
-          </p>
-          <p>
-            Claravoy captures this invisible competitive battleground. Unlike traditional SEO or brand tracking tools, <span class="highlight-text">we monitor the AI layer specifically</span> — the recommendations, comparisons, and rankings that AI platforms deliver directly to consumers. This is a net-new data category that no incumbent tool currently covers for grocery retail.
-          </p>
-        </div>
       </div>
 
       <!-- Current State + Sources -->
@@ -1626,7 +1569,7 @@
             <div>
               <div id="overview-cat-insight" style="font-size:13px; color:#5A5550; line-height:1.7; margin-bottom:12px;"></div>
               <div id="overview-cat-mini-stats" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:12px;"></div>
-              <button onclick="switchToTab('categories')" style="padding:8px 16px; background:#2D8A6E; color:#fff; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:500;">View Full Breakdown</button>
+              <button onclick="activateGroup('monitor'); switchToTab('categories')" style="padding:8px 16px; background:#2D8A6E; color:#fff; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:500;">View Full Breakdown</button>
             </div>
           </div>
         </div>
@@ -1665,80 +1608,121 @@
         </div>
       </div>
 
-      <!-- Product Vision -->
-      <div class="overview-grid">
-        <div class="overview-section overview-full">
-          <h3><span class="section-icon" style="background:#E8F5F0; color:#2D8A6E;">◇</span> Product Vision</h3>
-          <p>Claravoy is designed to evolve from a monitoring dashboard into a full agentic commerce optimization platform.</p>
-          <div class="vision-timeline">
-            <div class="vision-phase active">
-              <div class="phase-dot"></div>
-              <div class="phase-label">Phase 1 — Now</div>
-              <div class="phase-desc">Visibility monitoring, daily automated scoring, competitive benchmarking, and AI-generated recommendations for grocery chains.</div>
-            </div>
-            <div class="vision-phase">
-              <div class="phase-dot"></div>
-              <div class="phase-label">Phase 2 — Growth</div>
-              <div class="phase-desc">Multi-grocer SaaS platform. Self-service onboarding, white-label dashboards, expanded AI platform coverage, and historical trend analytics.</div>
-            </div>
-            <div class="vision-phase">
-              <div class="phase-dot"></div>
-              <div class="phase-label">Phase 3 — Platform</div>
-              <div class="phase-desc">Bidirectional intelligence — selling anonymized visibility insights back to CPG brands and food manufacturers. "What are AI platforms recommending to consumers?" becomes a data product.</div>
-            </div>
-            <div class="vision-phase">
-              <div class="phase-dot"></div>
-              <div class="phase-label">Phase 4 — Optimize</div>
-              <div class="phase-desc">Active optimization tools that help grocers influence their AI visibility — content recommendations, structured data strategies, and AI-specific brand positioning.</div>
+      <!-- Collapsible Details Section -->
+      <div style="margin-top: 32px;">
+        <button onclick="var el=document.getElementById('overview-details'); el.style.display = el.style.display === 'none' ? 'block' : 'none'; this.querySelector('.chevron').style.transform = el.style.display === 'none' ? '' : 'rotate(90deg)';" style="display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-size:15px; font-weight:600; color:#1A2740; padding:8px 0;">
+          <span class="chevron" style="transition:transform 0.2s; display:inline-block;">&#9654;</span> About Claravoy — Definitions, Vision & Pricing
+        </button>
+        <div id="overview-details" style="display:none;">
+          <!-- Key Definitions -->
+          <div class="overview-grid" style="margin-top: 24px;">
+            <div class="overview-section overview-full">
+              <h3><span class="section-icon" style="background:#E8F0FE; color:#2C5282;">≡</span> Key Definitions</h3>
+              <div class="def-grid">
+                <div class="def-item">
+                  <div class="def-term">Visibility Score (0–100)</div>
+                  <div class="def-desc">A proprietary composite score measuring how prominently a grocer appears across AI platform responses. Factors include mention frequency, position rank (listed 1st vs. 5th), mention type (primary recommendation vs. comparison), and sentiment. Higher is better.</div>
+                </div>
+                <div class="def-item">
+                  <div class="def-term">Mention Types</div>
+                  <div class="def-desc"><strong>Primary Recommendation</strong> — the AI directly recommends the grocer. <strong>Alternative Option</strong> — mentioned as another choice. <strong>Comparison Mention</strong> — named alongside competitors. <strong>Negative Mention</strong> — referenced unfavorably. <strong>Neutral Mention</strong> — named without clear sentiment.</div>
+                </div>
+                <div class="def-item">
+                  <div class="def-term">Target Market</div>
+                  <div class="def-desc">A geographic region where queries are tailored with local context (e.g., "best grocery in Des Moines" vs. "best grocery in St. Louis"). Allows per-market visibility benchmarking.</div>
+                </div>
+                <div class="def-item">
+                  <div class="def-term">Pipeline Run</div>
+                  <div class="def-desc">A single automated execution cycle that queries all 5 AI platforms for all 40 queries, parses the responses, detects grocer mentions, and computes updated visibility scores. Runs daily at 6:00 AM CT.</div>
+                </div>
+                <div class="def-item">
+                  <div class="def-term">Agentic Commerce</div>
+                  <div class="def-desc">The emerging paradigm where AI systems act as purchasing intermediaries — recommending products, stores, and brands on behalf of consumers. Visibility in this channel is the next frontier of retail marketing.</div>
+                </div>
+                <div class="def-item">
+                  <div class="def-term">Recommendation Engine</div>
+                  <div class="def-desc">An automated system that analyzes visibility data across platforms and generates strategic recommendations — identifying blind spots, upgrade opportunities, competitive strengths, and reputation risks.</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Commercial Tiers -->
-      <div class="overview-grid">
-        <div class="overview-section overview-full">
-          <h3><span class="section-icon" style="background:#FEF3E8; color:#D4782F;">⬡</span> Commercial Arrangements</h3>
-          <p>Claravoy is offered as a subscription service. Proposed tier structure for grocery chain clients:</p>
-          <div class="tier-grid">
-            <div class="tier-card">
-              <div class="tier-name">Monitor</div>
-              <div class="tier-price">$2,500 <span>/ mo</span></div>
-              <div class="tier-period">per chain, billed annually</div>
-              <ul class="tier-features">
-                <li>3 AI platforms monitored</li>
-                <li>Up to 20 tracked queries</li>
-                <li>2 target markets</li>
-                <li>Daily visibility scoring</li>
-                <li>Weekly email summary</li>
-                <li>Dashboard access (read-only)</li>
-              </ul>
+          <!-- Product Vision -->
+          <div class="overview-grid">
+            <div class="overview-section overview-full">
+              <h3><span class="section-icon" style="background:#E8F5F0; color:#2D8A6E;">◇</span> Product Vision</h3>
+              <p>Claravoy is designed to evolve from a monitoring dashboard into a full agentic commerce optimization platform.</p>
+              <div class="vision-timeline">
+                <div class="vision-phase active">
+                  <div class="phase-dot"></div>
+                  <div class="phase-label">Phase 1 — Now</div>
+                  <div class="phase-desc">Visibility monitoring, daily automated scoring, competitive benchmarking, and AI-generated recommendations for grocery chains.</div>
+                </div>
+                <div class="vision-phase">
+                  <div class="phase-dot"></div>
+                  <div class="phase-label">Phase 2 — Growth</div>
+                  <div class="phase-desc">Multi-grocer SaaS platform. Self-service onboarding, white-label dashboards, expanded AI platform coverage, and historical trend analytics.</div>
+                </div>
+                <div class="vision-phase">
+                  <div class="phase-dot"></div>
+                  <div class="phase-label">Phase 3 — Platform</div>
+                  <div class="phase-desc">Bidirectional intelligence — selling anonymized visibility insights back to CPG brands and food manufacturers. "What are AI platforms recommending to consumers?" becomes a data product.</div>
+                </div>
+                <div class="vision-phase">
+                  <div class="phase-dot"></div>
+                  <div class="phase-label">Phase 4 — Optimize</div>
+                  <div class="phase-desc">Active optimization tools that help grocers influence their AI visibility — content recommendations, structured data strategies, and AI-specific brand positioning.</div>
+                </div>
+              </div>
             </div>
-            <div class="tier-card featured">
-              <div class="tier-name">Intelligence</div>
-              <div class="tier-price">$5,000 <span>/ mo</span></div>
-              <div class="tier-period">per chain, billed annually</div>
-              <ul class="tier-features">
-                <li>All 5 AI platforms monitored</li>
-                <li>Up to 50 tracked queries</li>
-                <li>5 target markets</li>
-                <li>Daily scoring + recommendations</li>
-                <li>Competitive benchmarking (8 grocers)</li>
-                <li>Full dashboard + API access</li>
-              </ul>
-            </div>
-            <div class="tier-card">
-              <div class="tier-name">Enterprise</div>
-              <div class="tier-price">Custom</div>
-              <div class="tier-period">tailored engagement</div>
-              <ul class="tier-features">
-                <li>All current + upcoming platforms</li>
-                <li>Unlimited queries and markets</li>
-                <li>White-label dashboard option</li>
-                <li>CPG brand insight resale rights</li>
-                <li>Dedicated Claravoy strategist</li>
-                <li>Custom integrations + SLA</li>
-              </ul>
+          </div>
+
+          <!-- Commercial Tiers -->
+          <div class="overview-grid">
+            <div class="overview-section overview-full">
+              <h3><span class="section-icon" style="background:#FEF3E8; color:#D4782F;">⬡</span> Commercial Arrangements</h3>
+              <p>Claravoy is offered as a subscription service. Proposed tier structure for grocery chain clients:</p>
+              <div class="tier-grid">
+                <div class="tier-card">
+                  <div class="tier-name">Monitor</div>
+                  <div class="tier-price">$2,500 <span>/ mo</span></div>
+                  <div class="tier-period">per chain, billed annually</div>
+                  <ul class="tier-features">
+                    <li>3 AI platforms monitored</li>
+                    <li>Up to 20 tracked queries</li>
+                    <li>2 target markets</li>
+                    <li>Daily visibility scoring</li>
+                    <li>Weekly email summary</li>
+                    <li>Dashboard access (read-only)</li>
+                  </ul>
+                </div>
+                <div class="tier-card featured">
+                  <div class="tier-name">Intelligence</div>
+                  <div class="tier-price">$5,000 <span>/ mo</span></div>
+                  <div class="tier-period">per chain, billed annually</div>
+                  <ul class="tier-features">
+                    <li>All 5 AI platforms monitored</li>
+                    <li>Up to 50 tracked queries</li>
+                    <li>5 target markets</li>
+                    <li>Daily scoring + recommendations</li>
+                    <li>Competitive benchmarking (8 grocers)</li>
+                    <li>Full dashboard + API access</li>
+                  </ul>
+                </div>
+                <div class="tier-card">
+                  <div class="tier-name">Enterprise</div>
+                  <div class="tier-price">Custom</div>
+                  <div class="tier-period">tailored engagement</div>
+                  <ul class="tier-features">
+                    <li>All current + upcoming platforms</li>
+                    <li>Unlimited queries and markets</li>
+                    <li>White-label dashboard option</li>
+                    <li>CPG brand insight resale rights</li>
+                    <li>Dedicated Claravoy strategist</li>
+                    <li>Custom integrations + SLA</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1816,11 +1800,110 @@
       <div class="insight-box" id="key-insight-box">
         <strong>Key Insight:</strong> <span id="key-insight-text">Loading visibility insights...</span>
       </div>
-    </div>
 
-    <!-- TAB 2: PLATFORM BREAKDOWN -->
-    <div id="platforms" class="tab-content">
+      <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+      <!-- Platform Breakdown Section -->
       <div id="platforms-content"></div>
+
+      <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+      <!-- Visibility Drivers Section -->
+      <div class="card">
+        <h3 style="margin-bottom:4px;">Visibility Drivers</h3>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Understand <em>why</em> each grocer scores the way they do. Scores are modeled from live AI platform data across five key driver categories.</p>
+
+        <!-- Legend + Grocer selector row -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+          <div style="display:flex; gap:16px; flex-wrap:wrap; padding:12px 16px; background:#F5F2EE; border-radius:8px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:#2D8A6E; display:inline-block;"></span>
+              <strong>Strong</strong> <span style="color:#7A7570;">(70+)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:#D4782F; display:inline-block;"></span>
+              <strong>Moderate</strong> <span style="color:#7A7570;">(40–69)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:#C0392B; display:inline-block;"></span>
+              <strong>Weak</strong> <span style="color:#7A7570;">(&lt;40)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grocer selector -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare grocers:</label>
+          <div id="driver-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <!-- Sticky Key Insight -->
+        <div id="driver-insight" style="padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; display:none; margin-bottom:20px; position:sticky; top:0; z-index:10; box-shadow:0 4px 16px rgba(26,39,64,0.18);">
+          <div style="display:flex; align-items:flex-start; gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+            <div id="driver-insight-text" style="font-size:14px; line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Driver scorecard grid -->
+        <div id="driver-scorecards" style="display:grid; gap:16px;"></div>
+      </div>
+
+      <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+      <!-- Score Trends Section -->
+      <div class="card">
+        <h3 style="margin-bottom:4px;">Score Trends</h3>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Track how AI visibility scores change over time. Data updates daily from live pipeline runs.</p>
+
+        <!-- Controls row -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+          <!-- View toggle -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button class="trend-view-btn active" data-view="composite" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">Composite Score</button>
+            <button class="trend-view-btn" data-view="platforms" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">By Platform</button>
+          </div>
+          <!-- Time range -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button class="trend-range-btn" data-range="7" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">7 Days</button>
+            <button class="trend-range-btn active" data-range="14" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">14 Days</button>
+            <button class="trend-range-btn" data-range="all" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">All</button>
+          </div>
+          <!-- Promo overlay toggle -->
+          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
+            <button id="trend-promo-toggle" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">&#9733; Promos</button>
+          </div>
+        </div>
+
+        <!-- Competitor toggles -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare with competitors:</label>
+          <div id="trend-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <!-- Trend insight card -->
+        <div id="trend-insight" style="padding:14px 18px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; display:none; margin-bottom:20px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M2 14l4-5 3 3 5-8" fill="none" stroke="#D4782F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div id="trend-insight-text" style="font-size:14px; line-height:1.5;"></div>
+          </div>
+        </div>
+
+        <!-- Main chart -->
+        <div style="position:relative; height:380px; margin-bottom:24px;">
+          <canvas id="trend-chart-main"></canvas>
+        </div>
+
+        <!-- Summary stats row -->
+        <div id="trend-stats" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:16px;"></div>
+
+        <!-- Promo periods legend (hidden by default) -->
+        <div id="trend-promo-legend" style="display:none; padding:16px 20px; background:#F5F2EE; border-radius:10px; margin-top:16px;">
+          <div style="font-size:12px; font-weight:600; color:#1A2740; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Promotional Periods</div>
+          <div id="trend-promo-items" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px;"></div>
+          <div style="font-size:11px; color:#A09A94; margin-top:10px;">Shaded regions on the chart indicate active promotional periods. Overlaying promos with score trends helps identify which campaigns influence AI visibility.</div>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 3: COMPETITIVE LANDSCAPE -->
@@ -1878,106 +1961,40 @@
         </div>
         <div id="queries-table-container"></div>
       </div>
-    </div>
 
-    <!-- TAB: VISIBILITY DRIVERS -->
-    <div id="drivers" class="tab-content">
+      <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+      <!-- Query Gap Analysis Section -->
       <div class="card">
-        <h3 style="margin-bottom:4px;">Visibility Drivers</h3>
-        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Understand <em>why</em> each grocer scores the way they do. Scores are modeled from live AI platform data across five key driver categories.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+          <h3 style="margin:0;">Query Gap Analysis</h3>
+          <select id="gap-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+            <option value="all">All Markets</option>
+          </select>
+        </div>
+        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Queries where competitors appear but Hy-Vee doesn't — or where Hy-Vee ranks behind. These are the highest-value content opportunities.</p>
 
-        <!-- Legend + Grocer selector row -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
-          <div style="display:flex; gap:16px; flex-wrap:wrap; padding:12px 16px; background:#F5F2EE; border-radius:8px;">
-            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:#2D8A6E; display:inline-block;"></span>
-              <strong>Strong</strong> <span style="color:#7A7570;">(70+)</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:#D4782F; display:inline-block;"></span>
-              <strong>Moderate</strong> <span style="color:#7A7570;">(40–69)</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:#C0392B; display:inline-block;"></span>
-              <strong>Weak</strong> <span style="color:#7A7570;">(&lt;40)</span>
-            </div>
-          </div>
+        <!-- Loading state -->
+        <div id="gap-loading" style="text-align:center; padding:40px; color:#7A7570;">
+          <div style="font-size:14px;">Loading query data from pipeline...</div>
         </div>
 
-        <!-- Grocer selector -->
-        <div style="margin-bottom:16px;">
-          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare grocers:</label>
-          <div id="driver-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
-        </div>
+        <!-- Summary stats -->
+        <div id="gap-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px;"></div>
 
-        <!-- Sticky Key Insight -->
-        <div id="driver-insight" style="padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; display:none; margin-bottom:20px; position:sticky; top:0; z-index:10; box-shadow:0 4px 16px rgba(26,39,64,0.18);">
+        <!-- Headline insight -->
+        <div id="gap-headline" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:24px;">
           <div style="display:flex; align-items:flex-start; gap:12px;">
             <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
-            <div id="driver-insight-text" style="font-size:14px; line-height:1.6;"></div>
+            <div id="gap-headline-text" style="font-size:14px; line-height:1.6;"></div>
           </div>
         </div>
 
-        <!-- Driver scorecard grid -->
-        <div id="driver-scorecards" style="display:grid; gap:16px;"></div>
+        <!-- Gap cards -->
+        <div id="gap-cards" style="display:none; grid-template-columns:1fr; gap:12px;"></div>
       </div>
     </div>
 
-    <!-- TAB: SCORE TRENDS -->
-    <div id="trends" class="tab-content">
-      <div class="card">
-        <h3 style="margin-bottom:4px;">Score Trends</h3>
-        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Track how AI visibility scores change over time. Data updates daily from live pipeline runs.</p>
-
-        <!-- Controls row -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
-          <!-- View toggle -->
-          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
-            <button class="trend-view-btn active" data-view="composite" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">Composite Score</button>
-            <button class="trend-view-btn" data-view="platforms" style="padding:8px 16px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">By Platform</button>
-          </div>
-          <!-- Time range -->
-          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
-            <button class="trend-range-btn" data-range="7" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">7 Days</button>
-            <button class="trend-range-btn active" data-range="14" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:#1A2740; color:#fff;">14 Days</button>
-            <button class="trend-range-btn" data-range="all" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">All</button>
-          </div>
-          <!-- Promo overlay toggle -->
-          <div style="display:flex; gap:4px; background:#F5F2EE; border-radius:8px; padding:4px;">
-            <button id="trend-promo-toggle" style="padding:8px 14px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; background:transparent; color:#7A7570;">&#9733; Promos</button>
-          </div>
-        </div>
-
-        <!-- Competitor toggles -->
-        <div style="margin-bottom:16px;">
-          <label style="font-size:13px; color:#7A7570; font-weight:500;">Compare with competitors:</label>
-          <div id="trend-grocer-toggles" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
-        </div>
-
-        <!-- Trend insight card -->
-        <div id="trend-insight" style="padding:14px 18px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; display:none; margin-bottom:20px;">
-          <div style="display:flex; align-items:flex-start; gap:10px;">
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M2 14l4-5 3 3 5-8" fill="none" stroke="#D4782F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div id="trend-insight-text" style="font-size:14px; line-height:1.5;"></div>
-          </div>
-        </div>
-
-        <!-- Main chart -->
-        <div style="position:relative; height:380px; margin-bottom:24px;">
-          <canvas id="trend-chart-main"></canvas>
-        </div>
-
-        <!-- Summary stats row -->
-        <div id="trend-stats" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:16px;"></div>
-
-        <!-- Promo periods legend (hidden by default) -->
-        <div id="trend-promo-legend" style="display:none; padding:16px 20px; background:#F5F2EE; border-radius:10px; margin-top:16px;">
-          <div style="font-size:12px; font-weight:600; color:#1A2740; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Promotional Periods</div>
-          <div id="trend-promo-items" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px;"></div>
-          <div style="font-size:11px; color:#A09A94; margin-top:10px;">Shaded regions on the chart indicate active promotional periods. Overlaying promos with score trends helps identify which campaigns influence AI visibility.</div>
-        </div>
-      </div>
-    </div>
 
     <!-- TAB: WHAT CHANGED (TREND ALERTS) -->
     <div id="alerts" class="tab-content">
@@ -2164,49 +2181,49 @@
           <h4 style="margin:0 0 16px 0; color:#1A2740; font-size:15px; font-weight:600;">Category Breakdown</h4>
           <div id="cat-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
         </div>
-      </div>
-    </div>
 
-    <!-- TAB: AI SENTIMENT BY DEPARTMENT -->
-    <div id="sentiment" class="tab-content">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
-          <h3 style="margin:0;">AI Sentiment by Department</h3>
-          <div style="display:flex; gap:8px;">
-            <select id="sent-grocer-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
-              <option value="all">All Grocers</option>
-            </select>
-            <select id="sent-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
-              <option value="all">All Markets</option>
-            </select>
+        <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+        <!-- AI Sentiment by Department Section -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
+            <h3 style="margin:0;">AI Sentiment by Department</h3>
+            <div style="display:flex; gap:8px;">
+              <select id="sent-grocer-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+                <option value="all">All Grocers</option>
+              </select>
+              <select id="sent-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
+                <option value="all">All Markets</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">How AI platforms characterize each grocer across departments. Surfaces perception gaps — where AI narrative doesn't match reality — so category managers can take targeted action.</p>
+          <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">How AI platforms characterize each grocer across departments. Surfaces perception gaps — where AI narrative doesn't match reality — so category managers can take targeted action.</p>
 
-        <div id="sent-loading" style="text-align:center; padding:40px; color:#7A7570;">
-          <div style="font-size:14px;">Loading sentiment data...</div>
-        </div>
-
-        <!-- Insight card -->
-        <div id="sent-insight" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:20px;">
-          <div style="display:flex; align-items:flex-start; gap:12px;">
-            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
-            <div id="sent-insight-text" style="font-size:14px; line-height:1.6;"></div>
+          <div id="sent-loading" style="text-align:center; padding:40px; color:#7A7570;">
+            <div style="font-size:14px;">Loading sentiment data...</div>
           </div>
-        </div>
 
-        <!-- Summary stats -->
-        <div id="sent-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:24px;"></div>
-
-        <!-- Stacked bar chart -->
-        <div id="sent-chart-section" style="display:none; margin-bottom:24px;">
-          <div style="position:relative; height:360px;">
-            <canvas id="sent-chart-canvas"></canvas>
+          <!-- Insight card -->
+          <div id="sent-insight" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:20px;">
+            <div style="display:flex; align-items:flex-start; gap:12px;">
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
+              <div id="sent-insight-text" style="font-size:14px; line-height:1.6;"></div>
+            </div>
           </div>
-        </div>
 
-        <!-- Department detail cards -->
-        <div id="sent-detail-cards" style="display:none; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
+          <!-- Summary stats -->
+          <div id="sent-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:24px;"></div>
+
+          <!-- Stacked bar chart -->
+          <div id="sent-chart-section" style="display:none; margin-bottom:24px;">
+            <div style="position:relative; height:360px;">
+              <canvas id="sent-chart-canvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Department detail cards -->
+          <div id="sent-detail-cards" style="display:none; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px;"></div>
+        </div>
       </div>
     </div>
 
@@ -2246,37 +2263,6 @@
     </div>
 
     <!-- TAB: QUERY GAP ANALYSIS -->
-    <div id="querygap" class="tab-content">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:12px;">
-          <h3 style="margin:0;">Query Gap Analysis</h3>
-          <select id="gap-market-filter" style="padding:8px 12px; border:1px solid #D0CBC4; border-radius:6px; font-size:13px; color:#1A2740; background:#fff; cursor:pointer;">
-            <option value="all">All Markets</option>
-          </select>
-        </div>
-        <p style="color:#7A7570; font-size:14px; margin-bottom:20px;">Queries where competitors appear but Hy-Vee doesn't — or where Hy-Vee ranks behind. These are the highest-value content opportunities.</p>
-
-        <!-- Loading state -->
-        <div id="gap-loading" style="text-align:center; padding:40px; color:#7A7570;">
-          <div style="font-size:14px;">Loading query data from pipeline...</div>
-        </div>
-
-        <!-- Summary stats -->
-        <div id="gap-stats" style="display:none; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px;"></div>
-
-        <!-- Headline insight -->
-        <div id="gap-headline" style="display:none; padding:16px 20px; background:linear-gradient(135deg, #1A2740, #2C5282); color:#ffffff; border-radius:10px; margin-bottom:24px;">
-          <div style="display:flex; align-items:flex-start; gap:12px;">
-            <svg width="20" height="20" viewBox="0 0 16 16" fill="#D4782F" style="flex-shrink:0; margin-top:2px;"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a1 1 0 110 2 1 1 0 010-2zm-1 4h2v4H7V8z"/></svg>
-            <div id="gap-headline-text" style="font-size:14px; line-height:1.6;"></div>
-          </div>
-        </div>
-
-        <!-- Gap cards -->
-        <div id="gap-cards" style="display:none; grid-template-columns:1fr; gap:12px;"></div>
-      </div>
-    </div>
-
     <!-- TAB: ROI CALCULATOR -->
     <div id="roi" class="tab-content">
       <div class="card">
@@ -2345,6 +2331,35 @@
       <div class="insight-box" style="margin-top: 16px;">
         <strong>Key Takeaway:</strong> <span id="roi-insight">Adjust the sliders above to see the projected revenue impact.</span>
       </div>
+
+      <div style="border-top: 2px solid #E8E3DD; margin: 32px 0; padding-top: 8px;"></div>
+
+      <!-- ROI Attribution Loop Section -->
+      <div class="card" style="border-left: 4px solid #2D8A6E; margin-bottom: 24px;">
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <div style="background: #2D8A6E; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">&#x1f4b0;</div>
+          <div>
+            <div style="font-size: 18px; font-weight: 700; color: #1A2740; margin-bottom: 6px;">ROI Attribution Loop</div>
+            <div style="font-size: 13px; color: #7A7570;">Connect AI visibility score changes to same-store sales data. This is the ultimate proof point — demonstrating that improving AI visibility translates into real revenue lift at the store level.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background: #FFF8F0; border: 1px solid #D4782F; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 16px;">&#x26a0;&#xfe0f;</span>
+          <div style="font-size: 13px; color: #1A2740;"><strong>Demo Data:</strong> Sales figures shown are modeled estimates based on industry benchmarks. Connect your POS/sales data feed to see real attribution metrics.</div>
+        </div>
+      </div>
+      <div id="roi-attr-insight-card" class="card" style="display:none; border-left: 4px solid #2D8A6E; margin-bottom: 24px;">
+        <div class="card-title">Attribution Insight</div>
+        <div id="roi-attr-insight-text" style="font-size: 14px; color: #1A2740; line-height: 1.6;"></div>
+      </div>
+      <div id="roi-attr-stats-row" class="grid-4" style="display:none; margin-bottom: 24px;"></div>
+      <div id="roi-attr-chart-container" class="card" style="display:none; margin-bottom: 24px;">
+        <div class="card-title">Visibility Score vs. Weekly Sales Lift</div>
+        <div style="height: 380px; position: relative;"><canvas id="roi-attr-chart"></canvas></div>
+      </div>
+      <div id="roi-attr-market-cards" style="display:none;"></div>
     </div>
 
     <!-- TAB 5: PIPELINE STATUS -->
@@ -2434,33 +2449,6 @@
     </div>
 
     <!-- TAB: ROI ATTRIBUTION LOOP -->
-    <div id="roiattribution" class="tab-content">
-      <div class="card" style="border-left: 4px solid #2D8A6E; margin-bottom: 24px;">
-        <div style="display: flex; align-items: flex-start; gap: 16px;">
-          <div style="background: #2D8A6E; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">&#x1f4b0;</div>
-          <div>
-            <div style="font-size: 18px; font-weight: 700; color: #1A2740; margin-bottom: 6px;">ROI Attribution Loop</div>
-            <div style="font-size: 13px; color: #7A7570;">Connect AI visibility score changes to same-store sales data. This is the ultimate proof point — demonstrating that improving AI visibility translates into real revenue lift at the store level.</div>
-          </div>
-        </div>
-      </div>
-      <div class="card" style="background: #FFF8F0; border: 1px solid #D4782F; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 16px;">&#x26a0;&#xfe0f;</span>
-          <div style="font-size: 13px; color: #1A2740;"><strong>Demo Data:</strong> Sales figures shown are modeled estimates based on industry benchmarks. Connect your POS/sales data feed to see real attribution metrics.</div>
-        </div>
-      </div>
-      <div id="roi-attr-insight-card" class="card" style="display:none; border-left: 4px solid #2D8A6E; margin-bottom: 24px;">
-        <div class="card-title">Attribution Insight</div>
-        <div id="roi-attr-insight-text" style="font-size: 14px; color: #1A2740; line-height: 1.6;"></div>
-      </div>
-      <div id="roi-attr-stats-row" class="grid-4" style="display:none; margin-bottom: 24px;"></div>
-      <div id="roi-attr-chart-container" class="card" style="display:none; margin-bottom: 24px;">
-        <div class="card-title">Visibility Score vs. Weekly Sales Lift</div>
-        <div style="height: 380px; position: relative;"><canvas id="roi-attr-chart"></canvas></div>
-      </div>
-      <div id="roi-attr-market-cards" style="display:none;"></div>
-    </div>
 
   </div>
 
@@ -5997,9 +5985,9 @@
 
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'drivers', 'trends', 'alerts', 'platforms', 'competitive', 'queries', 'categories', 'sentiment'],
-      act: ['recommendations', 'querygap', 'contentstrategy', 'simulator', 'roi', 'storemap'],
-      insights: ['cpgbrands', 'expansion', 'roiattribution'],
+      monitor: ['visibility', 'competitive', 'alerts', 'categories', 'queries'],
+      act: ['recommendations', 'contentstrategy', 'simulator', 'storemap'],
+      insights: ['cpgbrands', 'expansion', 'roi'],
       admin: ['pipeline']
     };
 
@@ -6010,25 +5998,33 @@
       var selectedTab = document.getElementById(tabName);
       if (selectedTab) selectedTab.classList.add('active');
       // Initialize tab if needed
-      if (tabName === 'visibility') initVisibilityTab();
-      else if (tabName === 'platforms') initPlatformsTab();
+      if (tabName === 'visibility') {
+        initVisibilityTab();
+        initPlatformsTab();
+        initDriversTab();
+        initTrendsTab();
+      }
       else if (tabName === 'competitive') initCompetitiveTab();
-      else if (tabName === 'queries') initQueriesTab();
-      else if (tabName === 'storemap') initStoreMapTab();
-      else if (tabName === 'recommendations') initRecommendationsTab();
-      else if (tabName === 'pipeline') initPipelineTab();
-      else if (tabName === 'roi') initROITab();
-      else if (tabName === 'simulator') initSimulatorTab();
-      else if (tabName === 'drivers') initDriversTab();
-      else if (tabName === 'trends') initTrendsTab();
       else if (tabName === 'alerts') initAlertsTab();
-      else if (tabName === 'querygap') initQueryGapTab();
-      else if (tabName === 'categories') initCategoryTab();
-      else if (tabName === 'sentiment') initSentimentTab();
+      else if (tabName === 'categories') {
+        initCategoryTab();
+        initSentimentTab();
+      }
+      else if (tabName === 'queries') {
+        initQueriesTab();
+        initQueryGapTab();
+      }
+      else if (tabName === 'recommendations') initRecommendationsTab();
       else if (tabName === 'contentstrategy') initContentStrategyTab();
+      else if (tabName === 'simulator') initSimulatorTab();
+      else if (tabName === 'storemap') initStoreMapTab();
+      else if (tabName === 'roi') {
+        initROITab();
+        initROIAttributionTab();
+      }
       else if (tabName === 'cpgbrands') initCPGBrandsTab();
       else if (tabName === 'expansion') initExpansionTab();
-      else if (tabName === 'roiattribution') initROIAttributionTab();
+      else if (tabName === 'pipeline') initPipelineTab();
     }
 
     function activateGroup(groupName) {
