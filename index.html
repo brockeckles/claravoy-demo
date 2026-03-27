@@ -1977,10 +1977,10 @@
           <div id="rec-total-count" style="font-size: 36px; font-weight: 700; color: #1A2740;">—</div>
           <div class="text-secondary" style="font-size: 13px; margin-top: 8px;">based on latest pipeline data</div>
         </div>
-        <div class="card" title="Total projected visibility score improvement if all active recommendations are implemented">
-          <div class="card-title">Estimated Score Lift</div>
+        <div class="card" title="Sum of estimated point improvements across all categories and markets — not additive on a single score">
+          <div class="card-title">Total Potential Lift</div>
           <div id="rec-total-lift" style="font-size: 36px; font-weight: 700; color: #2D8A6E;">—</div>
-          <div class="text-secondary" style="font-size: 13px; margin-top: 8px;">if all recommendations implemented</div>
+          <div class="text-secondary" style="font-size: 13px; margin-top: 8px;">across all categories &amp; markets</div>
         </div>
         <div class="card" title="Recommendations flagged as critical or high priority — these represent significant gaps or risks">
           <div class="card-title">Critical / High Priority</div>
@@ -2895,7 +2895,7 @@
       const recMarket = (document.getElementById('rec-market-filter') || {}).value || 'All Markets';
 
       let filtered = RECOMMENDATIONS;
-      if (recMarket !== 'All Markets') filtered = filtered.filter(r => r.target_market === recMarket);
+      if (recMarket !== 'All Markets') filtered = filtered.filter(r => r.target_market === recMarket || r.target_market === 'All Markets');
       if (typeFilter) filtered = filtered.filter(r => r.rec_type === typeFilter);
       if (priorityFilter) filtered = filtered.filter(r => r.priority === priorityFilter);
 
