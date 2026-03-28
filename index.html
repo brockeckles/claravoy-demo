@@ -1703,7 +1703,6 @@
             <div class="source-pill"><span class="source-dot" style="background:#1A7F64;"></span>Perplexity AI</div>
             <div class="source-pill"><span class="source-dot" style="background:#4285F4;"></span>Google AI Overview</div>
             <div class="source-pill"><span class="source-dot" style="background:#0668E1;"></span>Meta AI</div>
-            <div class="source-pill"><span class="source-dot" style="background:#00CAFF;"></span>Amazon Alexa</div>
           </div>
           <p style="margin-top: 16px; font-size: 12px; color: #A09A94;">
             Additional platforms (Apple Intelligence, Microsoft Copilot, Samsung Bixby) are on the near-term roadmap.
@@ -1929,7 +1928,7 @@
                 <div class="stat-lbl">Strongest Platform</div>
               </div>
               <div class="score-hero-stat">
-                <div class="stat-val" id="hero-worst-platform">Alexa</div>
+                <div class="stat-val" id="hero-worst-platform">—</div>
                 <div class="stat-lbl">Biggest Opportunity</div>
               </div>
             </div>
@@ -2612,8 +2611,7 @@
       { id: 1, name: 'ChatGPT Shopping', slug: 'chatgpt', color: '#2D8A6E' },
       { id: 2, name: 'Perplexity Shopping', slug: 'perplexity', color: '#5B4A9E' },
       { id: 3, name: 'Google AI Overview', slug: 'google-ai', color: '#D4782F' },
-      { id: 4, name: 'Meta AI', slug: 'meta-ai', color: '#3b82f6' },
-      { id: 5, name: 'Alexa Shopping', slug: 'alexa', color: '#2B7A96' }
+      { id: 4, name: 'Meta AI', slug: 'meta-ai', color: '#3b82f6' }
     ];
 
     const GROCERS = [
@@ -2650,8 +2648,7 @@
       chatgpt: [40,41,42,43,42,44,45,44,46,45,47,46,47,48],
       perplexity: [36,37,38,39,38,40,41,40,42,41,43,42,43,44],
       'google-ai': [38,39,40,41,40,42,43,42,44,43,45,44,45,46],
-      'meta-ai': [33,34,35,36,35,37,38,37,39,38,40,39,40,41],
-      alexa: [15,16,18,17,20,22,21,24,23,25,26,28,27,29]
+      'meta-ai': [33,34,35,36,35,37,38,37,39,38,40,39,40,41]
     };
 
     // Competitor historical daily composite scores (populated by loadLiveData)
@@ -2659,16 +2656,16 @@
 
     // Competitor latest-day composite scores
     // REAL DATA from 2026-03-24 web search across ChatGPT, Perplexity, Google AI, Meta AI
-    // Alexa: voice-only platform — Wegmans/Schnucks: limited coverage in primary markets
+    // Wegmans/Schnucks: limited coverage in primary markets
     const COMPETITOR_LATEST = {
-      'hy-vee': { composite: 42, chatgpt: 48, perplexity: 44, 'google-ai': 46, 'meta-ai': 41, alexa: 29 },
-      'walmart': { composite: 73, chatgpt: 65, perplexity: 84, 'google-ai': 63, 'meta-ai': 62, alexa: 92 },
-      'fareway': { composite: 56, chatgpt: 72, perplexity: 60, 'google-ai': 63, 'meta-ai': 75, alexa: 10 },
-      'aldi': { composite: 61, chatgpt: 60, perplexity: 72, 'google-ai': 58, 'meta-ai': 62, alexa: 55 },
-      'fresh-thyme': { composite: 42, chatgpt: 45, perplexity: 52, 'google-ai': 55, 'meta-ai': 48, alexa: 12 },
-      'kroger': { composite: 67, chatgpt: 78, perplexity: 80, 'google-ai': 75, 'meta-ai': 72, alexa: 32 },
-      'wegmans': { composite: 42, chatgpt: 52, perplexity: 40, 'google-ai': 48, 'meta-ai': 38, alexa: 18 },
-      'schnucks': { composite: 27, chatgpt: 30, perplexity: 25, 'google-ai': 32, 'meta-ai': 25, alexa: 8 }
+      'hy-vee': { composite: 56, chatgpt: 62, perplexity: 51, 'google-ai': 51, 'meta-ai': 62 },
+      'walmart': { composite: 69, chatgpt: 65, perplexity: 84, 'google-ai': 63, 'meta-ai': 62 },
+      'fareway': { composite: 68, chatgpt: 72, perplexity: 60, 'google-ai': 63, 'meta-ai': 75 },
+      'aldi': { composite: 63, chatgpt: 60, perplexity: 72, 'google-ai': 58, 'meta-ai': 62 },
+      'fresh-thyme': { composite: 50, chatgpt: 45, perplexity: 52, 'google-ai': 55, 'meta-ai': 48 },
+      'kroger': { composite: 76, chatgpt: 78, perplexity: 80, 'google-ai': 75, 'meta-ai': 72 },
+      'wegmans': { composite: 45, chatgpt: 52, perplexity: 40, 'google-ai': 48, 'meta-ai': 38 },
+      'schnucks': { composite: 28, chatgpt: 30, perplexity: 25, 'google-ai': 32, 'meta-ai': 25 }
     };
 
     const RECENT_MENTIONS = {
@@ -2735,16 +2732,13 @@
         { query: 'online ordering Des Moines', grocer: 'Walmart', type: 'primary_recommendation', rank: 1, sentiment: 'positive', description: 'Walmart leads online ordering with free same-day pickup.', strengths: ['free same-day pickup'] },
         { query: 'online ordering Des Moines', grocer: 'Hy-Vee', type: 'alternative_option', rank: 2, sentiment: 'positive', description: 'Hy-Vee Aisles Online for delivery and pickup.', strengths: ['Aisles Online', 'pickup', 'delivery'] }
       ],
-      alexa: [
-        { query: 'best grocery store in Des Moines', grocer: 'Walmart', type: 'primary_recommendation', rank: 1, sentiment: 'neutral', description: 'Walmart is widely available with online shopping options.', strengths: ['availability', 'online'] }
-      ]
     };
 
     const PIPELINE_RUNS = [
       { run: 15, status: 'success', date: '2026-03-24', duration: '35m 00s', queries: '10/10', errors: null, notes: 'REAL DATA — Manual web search, Google AI only, 10 consumer-intent queries' },
       { run: 14, status: 'success', date: '2026-03-24', duration: '3m 12s', queries: '50/50', errors: null },
       { run: 13, status: 'success', date: '2026-03-23', duration: '8m 15s', queries: '50/50', errors: null },
-      { run: 12, status: 'warning', date: '2026-03-22', duration: '9m 42s', queries: '50/50', errors: 'Alexa timeout on query 7' },
+      { run: 12, status: 'warning', date: '2026-03-22', duration: '9m 42s', queries: '50/50', errors: 'Meta AI timeout on query 7' },
       { run: 11, status: 'success', date: '2026-03-21', duration: '8m 08s', queries: '50/50', errors: null },
       { run: 10, status: 'success', date: '2026-03-20', duration: '7m 55s', queries: '50/50', errors: null },
       { run: 9, status: 'error', date: '2026-03-19', duration: '2m 31s', queries: '18/50', errors: 'OpenAI API rate limit exceeded' },
@@ -3688,7 +3682,6 @@
               <th title="Visibility score on Perplexity AI (0–100)">Perplexity</th>
               <th title="Visibility score on Google's AI Overview (0–100)">Google AI</th>
               <th title="Visibility score on Meta AI (0–100)">Meta AI</th>
-              <th title="Visibility score on Amazon Alexa voice responses (0–100)">Alexa</th>
               <th title="Average visibility score across all platforms (0–100)">Composite</th>
               <th title="Number of store locations in monitored markets">Stores</th>
             </tr>
@@ -3705,7 +3698,6 @@
             <td><span class="score-cell ${getScoreCellClass(data.perplexity)}">${data.perplexity}</span></td>
             <td><span class="score-cell ${getScoreCellClass(data['google-ai'])}">${data['google-ai']}</span></td>
             <td><span class="score-cell ${getScoreCellClass(data['meta-ai'])}">${data['meta-ai']}</span></td>
-            <td><span class="score-cell ${getScoreCellClass(data.alexa)}">${data.alexa}</span></td>
             <td style="font-weight: 600;"><span class="score-cell ${getScoreCellClass(data.composite)}">${data.composite}</span></td>
             <td class="text-right">${grocer.stores.toLocaleString()}</td>
           </tr>
@@ -3724,27 +3716,9 @@
       if (charts['competitive-radar']) return;
 
       const platformNames = PLATFORMS.map(p => p.name.replace(' Shopping', '').replace(' Overview', ''));
-      const hyveeData = [
-        COMPETITOR_LATEST['hy-vee'].chatgpt,
-        COMPETITOR_LATEST['hy-vee'].perplexity,
-        COMPETITOR_LATEST['hy-vee']['google-ai'],
-        COMPETITOR_LATEST['hy-vee']['meta-ai'],
-        COMPETITOR_LATEST['hy-vee'].alexa
-      ];
-      const walmartData = [
-        COMPETITOR_LATEST['walmart'].chatgpt,
-        COMPETITOR_LATEST['walmart'].perplexity,
-        COMPETITOR_LATEST['walmart']['google-ai'],
-        COMPETITOR_LATEST['walmart']['meta-ai'],
-        COMPETITOR_LATEST['walmart'].alexa
-      ];
-      const farewayData = [
-        COMPETITOR_LATEST['fareway'].chatgpt,
-        COMPETITOR_LATEST['fareway'].perplexity,
-        COMPETITOR_LATEST['fareway']['google-ai'],
-        COMPETITOR_LATEST['fareway']['meta-ai'],
-        COMPETITOR_LATEST['fareway'].alexa
-      ];
+      const hyveeData = PLATFORMS.map(p => COMPETITOR_LATEST['hy-vee'][p.slug] || 0);
+      const walmartData = PLATFORMS.map(p => COMPETITOR_LATEST['walmart'][p.slug] || 0);
+      const farewayData = PLATFORMS.map(p => COMPETITOR_LATEST['fareway'][p.slug] || 0);
 
       charts['competitive-radar'] = new Chart(ctx, {
         type: 'radar',
@@ -4160,9 +4134,9 @@
         'wegmans': 'Wegmans', 'schnucks': 'Schnucks'
       };
 
-      // COMPETITOR_LATEST is flat: { 'hy-vee': { composite: 59, chatgpt: 87, perplexity: 61, 'google-ai': 46, 'meta-ai': 72, alexa: 28 }, ... }
+      // COMPETITOR_LATEST is flat: { 'hy-vee': { composite: 59, chatgpt: 87, perplexity: 61, 'google-ai': 46, 'meta-ai': 72 }, ... }
       var grocerDrivers = {};
-      var platformKeys = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai', 'alexa'];
+      var platformKeys = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai'];
 
       Object.keys(COMPETITOR_LATEST).forEach(function(slug) {
         var data = COMPETITOR_LATEST[slug];
@@ -4173,12 +4147,11 @@
         var perplexityScore = data['perplexity'] || 0;
         var googleScore = data['google-ai'] || 0;
         var metaScore = data['meta-ai'] || 0;
-        var alexaScore = data['alexa'] || 0;
 
         // Count how many platforms have non-zero scores
-        var platformScores = [chatgptScore, perplexityScore, googleScore, metaScore, alexaScore];
+        var platformScores = [chatgptScore, perplexityScore, googleScore, metaScore];
         var activePlatforms = platformScores.filter(function(s) { return s > 0; }).length;
-        var coverageRatio = activePlatforms / 5;
+        var coverageRatio = activePlatforms / 4;
         var totalScore = platformScores.reduce(function(a, b) { return a + b; }, 0);
 
         // Model 5 driver scores from platform performance signals
@@ -4188,7 +4161,7 @@
         structuredData = Math.min(100, Math.max(0, structuredData));
 
         // 2. Knowledge Graph — platform breadth + composite strength signals identity presence
-        var knowledgeGraph = Math.round(coverageRatio * 45 + (composite / 100) * 35 + (activePlatforms === 5 ? 20 : activePlatforms >= 3 ? 10 : 0));
+        var knowledgeGraph = Math.round(coverageRatio * 45 + (composite / 100) * 35 + (activePlatforms === 4 ? 20 : activePlatforms >= 3 ? 10 : 0));
         knowledgeGraph = Math.min(100, Math.max(0, knowledgeGraph));
 
         // 3. Reviews & Reputation — ChatGPT + Google (reputation-sensitive) + composite as quality proxy
@@ -4199,8 +4172,8 @@
         var contentFootprint = Math.round(chatgptScore * 0.5 + perplexityScore * 0.4 + (composite > 50 ? 10 : 5));
         contentFootprint = Math.min(100, Math.max(0, contentFootprint));
 
-        // 5. Third-Party Feeds — Meta AI + Alexa (rely on external aggregators/social signals)
-        var thirdParty = Math.round(metaScore * 0.45 + alexaScore * 0.35 + coverageRatio * 20);
+        // 5. Third-Party Feeds — Meta AI (relies on external aggregators/social signals)
+        var thirdParty = Math.round(metaScore * 0.6 + coverageRatio * 25 + (composite > 50 ? 15 : 5));
         thirdParty = Math.min(100, Math.max(0, thirdParty));
 
         grocerDrivers[slug] = {
@@ -4373,8 +4346,7 @@
         'chatgpt': { color: '#10A37F', label: 'ChatGPT' },
         'perplexity': { color: '#20808D', label: 'Perplexity' },
         'google-ai': { color: '#4285F4', label: 'Google AI' },
-        'meta-ai': { color: '#0668E1', label: 'Meta AI' },
-        'alexa': { color: '#00CAFF', label: 'Alexa' }
+        'meta-ai': { color: '#0668E1', label: 'Meta AI' }
       };
 
       var GROCER_COLORS = {
@@ -4786,7 +4758,7 @@
 
       var PLATFORM_NAMES = {
         'chatgpt': 'ChatGPT', 'perplexity': 'Perplexity',
-        'google-ai': 'Google AI', 'meta-ai': 'Meta AI', 'alexa': 'Alexa'
+        'google-ai': 'Google AI', 'meta-ai': 'Meta AI'
       };
 
       // Determine date range for "this week"
@@ -5295,7 +5267,7 @@
         var queryGaps = {}; // queryText → { market, category, missingPlatforms[], competitorWins: { grocer: [platforms] } }
         var catScores = {}; // category → { hy-vee: [scores], other: [scores] }
         var platformNames = { 'a1a00000-0000-0000-0000-000000000001': 'ChatGPT', 'a1a00000-0000-0000-0000-000000000002': 'Perplexity',
-          'a1a00000-0000-0000-0000-000000000003': 'Google AI', 'a1a00000-0000-0000-0000-000000000004': 'Meta AI', 'a1a00000-0000-0000-0000-000000000005': 'Alexa' };
+          'a1a00000-0000-0000-0000-000000000003': 'Google AI', 'a1a00000-0000-0000-0000-000000000004': 'Meta AI' };
 
         // Build query-platform map (same as Query Gaps tab)
         var qpMap = {}; // queryText|platform → { grocer: mentionType }
@@ -5893,7 +5865,7 @@
       };
       var PLATFORM_NAMES = {
         'chatgpt': 'ChatGPT', 'perplexity': 'Perplexity',
-        'google-ai': 'Google AI', 'meta-ai': 'Meta AI', 'alexa': 'Alexa'
+        'google-ai': 'Google AI', 'meta-ai': 'Meta AI'
       };
 
       // Fetch mention data from Supabase
@@ -5928,7 +5900,6 @@
           'a1a00000-0000-0000-0000-000000000002': 'perplexity',
           'a1a00000-0000-0000-0000-000000000003': 'google-ai',
           'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
-          'a1a00000-0000-0000-0000-000000000005': 'alexa',
         };
 
         // Build per-query, per-platform mention map
@@ -5974,7 +5945,7 @@
 
         // Analyze gaps: for each query+platform, find where Hy-Vee is absent/weak but competitors appear
         var allQueries = Object.keys(queryMeta);
-        var platforms = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai', 'alexa'];
+        var platforms = ['chatgpt', 'perplexity', 'google-ai', 'meta-ai'];
 
         function buildGapCards(marketFilterValue) {
           var gaps = [];
@@ -6292,7 +6263,6 @@
           'a1a00000-0000-0000-0000-000000000002': 'perplexity',
           'a1a00000-0000-0000-0000-000000000003': 'google-ai',
           'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
-          'a1a00000-0000-0000-0000-000000000005': 'alexa',
         };
         const grocerMap = {
           'b1b00000-0000-0000-0000-000000000001': 'hy-vee',
@@ -6385,7 +6355,6 @@
             'a1a00000-0000-0000-0000-000000000002': 'perplexity',
             'a1a00000-0000-0000-0000-000000000003': 'google-ai',
             'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
-            'a1a00000-0000-0000-0000-000000000005': 'alexa',
           };
           // Two-pass: prefer home market (Des Moines) over All Markets for Hy-Vee
           const byDatePlatHome = {};
@@ -6519,7 +6488,6 @@
           'a1a00000-0000-0000-0000-000000000002': 'perplexity',
           'a1a00000-0000-0000-0000-000000000003': 'google-ai',
           'a1a00000-0000-0000-0000-000000000004': 'meta-ai',
-          'a1a00000-0000-0000-0000-000000000005': 'alexa',
         };
         const liveMentions = {};
         for (const m of mentions) {
@@ -6682,20 +6650,20 @@
       // Demo CPG brand data — modeled from typical AI grocery query responses
       // In production, pipeline would extract brand mentions from ai_responses.raw_response
       var CPG_BRANDS = {
-        'Red Bull': { category: 'Beverages', mentions: { 'hy-vee': 14, 'walmart': 22, 'kroger': 18, 'aldi': 5, 'schnucks': 8 }, platforms: { chatgpt: 12, perplexity: 9, 'google-ai': 15, 'meta-ai': 8, alexa: 6 }, sentiment: 'positive' },
-        'Coca-Cola': { category: 'Beverages', mentions: { 'hy-vee': 18, 'walmart': 28, 'kroger': 20, 'aldi': 8, 'schnucks': 12 }, platforms: { chatgpt: 18, perplexity: 14, 'google-ai': 20, 'meta-ai': 16, alexa: 12 }, sentiment: 'positive' },
-        'National Beef': { category: 'Meat & Protein', mentions: { 'hy-vee': 22, 'walmart': 10, 'kroger': 14, 'fareway': 18, 'schnucks': 6 }, platforms: { chatgpt: 14, perplexity: 10, 'google-ai': 18, 'meta-ai': 8, alexa: 4 }, sentiment: 'positive' },
-        'Tyson Foods': { category: 'Meat & Protein', mentions: { 'hy-vee': 16, 'walmart': 24, 'kroger': 20, 'fareway': 12, 'schnucks': 10 }, platforms: { chatgpt: 16, perplexity: 12, 'google-ai': 14, 'meta-ai': 10, alexa: 8 }, sentiment: 'neutral' },
-        'Organic Valley': { category: 'Dairy & Organic', mentions: { 'hy-vee': 20, 'walmart': 6, 'kroger': 12, 'fresh-thyme': 18, 'wegmans': 16 }, platforms: { chatgpt: 15, perplexity: 14, 'google-ai': 10, 'meta-ai': 8, alexa: 5 }, sentiment: 'positive' },
-        'Tillamook': { category: 'Dairy & Organic', mentions: { 'hy-vee': 10, 'walmart': 8, 'kroger': 14, 'fresh-thyme': 6, 'wegmans': 12 }, platforms: { chatgpt: 10, perplexity: 8, 'google-ai': 12, 'meta-ai': 6, alexa: 4 }, sentiment: 'positive' },
-        "Nature's Path": { category: 'Breakfast & Cereal', mentions: { 'hy-vee': 8, 'walmart': 4, 'kroger': 6, 'fresh-thyme': 14, 'wegmans': 12 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 6, 'meta-ai': 4, alexa: 2 }, sentiment: 'positive' },
-        'General Mills': { category: 'Breakfast & Cereal', mentions: { 'hy-vee': 14, 'walmart': 22, 'kroger': 18, 'aldi': 10, 'schnucks': 12 }, platforms: { chatgpt: 16, perplexity: 10, 'google-ai': 18, 'meta-ai': 12, alexa: 10 }, sentiment: 'neutral' },
-        'Frito-Lay': { category: 'Snacks', mentions: { 'hy-vee': 12, 'walmart': 26, 'kroger': 16, 'aldi': 6, 'schnucks': 8 }, platforms: { chatgpt: 14, perplexity: 8, 'google-ai': 16, 'meta-ai': 10, alexa: 8 }, sentiment: 'neutral' },
-        "Hershey's": { category: 'Snacks', mentions: { 'hy-vee': 10, 'walmart': 20, 'kroger': 14, 'aldi': 4, 'schnucks': 6 }, platforms: { chatgpt: 10, perplexity: 6, 'google-ai': 12, 'meta-ai': 8, alexa: 6 }, sentiment: 'neutral' },
-        'Dawn / P&G': { category: 'Household', mentions: { 'hy-vee': 8, 'walmart': 24, 'kroger': 16, 'aldi': 6, 'schnucks': 4 }, platforms: { chatgpt: 12, perplexity: 8, 'google-ai': 14, 'meta-ai': 6, alexa: 10 }, sentiment: 'neutral' },
-        'Seventh Generation': { category: 'Household', mentions: { 'hy-vee': 6, 'walmart': 8, 'kroger': 4, 'fresh-thyme': 12, 'wegmans': 14 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 6, 'meta-ai': 4, alexa: 2 }, sentiment: 'positive' },
-        'Blue Diamond': { category: 'Health & Wellness', mentions: { 'hy-vee': 10, 'walmart': 12, 'kroger': 8, 'fresh-thyme': 10, 'wegmans': 8 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 8, 'meta-ai': 6, alexa: 4 }, sentiment: 'positive' },
-        'KIND Snacks': { category: 'Health & Wellness', mentions: { 'hy-vee': 12, 'walmart': 14, 'kroger': 10, 'fresh-thyme': 8, 'wegmans': 10 }, platforms: { chatgpt: 10, perplexity: 12, 'google-ai': 8, 'meta-ai': 6, alexa: 4 }, sentiment: 'positive' }
+        'Red Bull': { category: 'Beverages', mentions: { 'hy-vee': 14, 'walmart': 22, 'kroger': 18, 'aldi': 5, 'schnucks': 8 }, platforms: { chatgpt: 12, perplexity: 9, 'google-ai': 15, 'meta-ai': 8 }, sentiment: 'positive' },
+        'Coca-Cola': { category: 'Beverages', mentions: { 'hy-vee': 18, 'walmart': 28, 'kroger': 20, 'aldi': 8, 'schnucks': 12 }, platforms: { chatgpt: 18, perplexity: 14, 'google-ai': 20, 'meta-ai': 16 }, sentiment: 'positive' },
+        'National Beef': { category: 'Meat & Protein', mentions: { 'hy-vee': 22, 'walmart': 10, 'kroger': 14, 'fareway': 18, 'schnucks': 6 }, platforms: { chatgpt: 14, perplexity: 10, 'google-ai': 18, 'meta-ai': 8 }, sentiment: 'positive' },
+        'Tyson Foods': { category: 'Meat & Protein', mentions: { 'hy-vee': 16, 'walmart': 24, 'kroger': 20, 'fareway': 12, 'schnucks': 10 }, platforms: { chatgpt: 16, perplexity: 12, 'google-ai': 14, 'meta-ai': 10 }, sentiment: 'neutral' },
+        'Organic Valley': { category: 'Dairy & Organic', mentions: { 'hy-vee': 20, 'walmart': 6, 'kroger': 12, 'fresh-thyme': 18, 'wegmans': 16 }, platforms: { chatgpt: 15, perplexity: 14, 'google-ai': 10, 'meta-ai': 8 }, sentiment: 'positive' },
+        'Tillamook': { category: 'Dairy & Organic', mentions: { 'hy-vee': 10, 'walmart': 8, 'kroger': 14, 'fresh-thyme': 6, 'wegmans': 12 }, platforms: { chatgpt: 10, perplexity: 8, 'google-ai': 12, 'meta-ai': 6 }, sentiment: 'positive' },
+        "Nature's Path": { category: 'Breakfast & Cereal', mentions: { 'hy-vee': 8, 'walmart': 4, 'kroger': 6, 'fresh-thyme': 14, 'wegmans': 12 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 6, 'meta-ai': 4 }, sentiment: 'positive' },
+        'General Mills': { category: 'Breakfast & Cereal', mentions: { 'hy-vee': 14, 'walmart': 22, 'kroger': 18, 'aldi': 10, 'schnucks': 12 }, platforms: { chatgpt: 16, perplexity: 10, 'google-ai': 18, 'meta-ai': 12 }, sentiment: 'neutral' },
+        'Frito-Lay': { category: 'Snacks', mentions: { 'hy-vee': 12, 'walmart': 26, 'kroger': 16, 'aldi': 6, 'schnucks': 8 }, platforms: { chatgpt: 14, perplexity: 8, 'google-ai': 16, 'meta-ai': 10 }, sentiment: 'neutral' },
+        "Hershey's": { category: 'Snacks', mentions: { 'hy-vee': 10, 'walmart': 20, 'kroger': 14, 'aldi': 4, 'schnucks': 6 }, platforms: { chatgpt: 10, perplexity: 6, 'google-ai': 12, 'meta-ai': 8 }, sentiment: 'neutral' },
+        'Dawn / P&G': { category: 'Household', mentions: { 'hy-vee': 8, 'walmart': 24, 'kroger': 16, 'aldi': 6, 'schnucks': 4 }, platforms: { chatgpt: 12, perplexity: 8, 'google-ai': 14, 'meta-ai': 6 }, sentiment: 'neutral' },
+        'Seventh Generation': { category: 'Household', mentions: { 'hy-vee': 6, 'walmart': 8, 'kroger': 4, 'fresh-thyme': 12, 'wegmans': 14 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 6, 'meta-ai': 4 }, sentiment: 'positive' },
+        'Blue Diamond': { category: 'Health & Wellness', mentions: { 'hy-vee': 10, 'walmart': 12, 'kroger': 8, 'fresh-thyme': 10, 'wegmans': 8 }, platforms: { chatgpt: 8, perplexity: 10, 'google-ai': 8, 'meta-ai': 6 }, sentiment: 'positive' },
+        'KIND Snacks': { category: 'Health & Wellness', mentions: { 'hy-vee': 12, 'walmart': 14, 'kroger': 10, 'fresh-thyme': 8, 'wegmans': 10 }, platforms: { chatgpt: 10, perplexity: 12, 'google-ai': 8, 'meta-ai': 6 }, sentiment: 'positive' }
       };
 
       var BRAND_COLORS = {
