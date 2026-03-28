@@ -470,6 +470,154 @@
       gap: 4px;
     }
 
+    /* Roadmap nav button — subtle differentiation */
+    .nav-group-btn.roadmap-btn {
+      color: #B0AAA3;
+      font-weight: 400;
+    }
+    .nav-group-btn.roadmap-btn:hover { color: #7A7570; }
+    .nav-group-btn.roadmap-btn.active {
+      color: #7A7570;
+      border-bottom-color: #B0AAA3;
+      font-weight: 500;
+    }
+
+    /* Phase 2 badges on roadmap sub-tabs */
+    .phase-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #E8E3DD 0%, #D0CBC4 100%);
+      color: #7A7570;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-right: 4px;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .nav-sub-btn.roadmap-sub {
+      color: #B0AAA3;
+    }
+    .nav-sub-btn.roadmap-sub:hover { color: #7A7570; }
+    .nav-sub-btn.roadmap-sub.active {
+      color: #7A7570;
+    }
+
+    /* Admin gear icon — small, right-aligned */
+    .nav-admin-link {
+      background: transparent;
+      border: none;
+      color: #B0AAA3;
+      cursor: pointer;
+      padding: 8px;
+      margin-left: auto;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-admin-link:hover { color: #7A7570; }
+    .nav-admin-link.active { color: #1A2740; }
+
+    /* ===== GUIDED TOUR OVERLAY ===== */
+    .tour-overlay {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1A2740;
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 20px 28px;
+      box-shadow: 0 12px 40px rgba(26, 39, 64, 0.35);
+      z-index: 9999;
+      max-width: 520px;
+      width: 90%;
+      font-family: 'Inter', sans-serif;
+    }
+    .tour-overlay.active { display: block; }
+    .tour-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .tour-step-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+    .tour-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .tour-close:hover { color: #ffffff; }
+    .tour-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .tour-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .tour-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tour-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .tour-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+    }
+    .tour-dot.active {
+      background: #ffffff;
+    }
+    .tour-dot.completed {
+      background: rgba(255,255,255,0.5);
+    }
+    .tour-btn {
+      background: #ffffff;
+      color: #1A2740;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tour-btn:hover { background: #E8E3DD; }
+    .tour-btn-back {
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .tour-btn-back:hover {
+      color: #ffffff;
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.1);
+    }
+    .tour-btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
     /* Tab Content */
     .tab-content {
       display: none;
@@ -1423,17 +1571,20 @@
           <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM8 4v4.5l3 1.5-.5 1L7 9V4h1z"/></svg>
           Monitor
         </button>
+        <button class="nav-group-btn" data-group="analyze">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 14h14v1H1v-1zm1-1V8h2v5H2zm3 0V5h2v8H5zm3 0V2h2v11H8zm3 0V6h2v7h-2z"/></svg>
+          Analyze
+        </button>
         <button class="nav-group-btn" data-group="act">
           <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2A1.5 1.5 0 001 3.5v9A1.5 1.5 0 002.5 14h11a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0013.5 2h-11zM3 5h10v1H3V5zm0 3h6v1H3V8z"/></svg>
           Act
         </button>
-        <button class="nav-group-btn" data-group="insights">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM7 4v5l3.5 2.1.75-1.23L8.5 8.25V4H7z"/></svg>
-          Insights
+        <button class="nav-group-btn roadmap-btn" data-group="roadmap">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h10l1 1v12l-1 1H3l-1-1V2l1-1zm1 2v2h8V3H4zm0 4v2h8V7H4zm0 4v2h5v-2H4z"/></svg>
+          Roadmap
         </button>
-        <button class="nav-group-btn" data-group="admin">
-          <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1.5 4v4c0 3.87 2.77 7.49 6.5 8.25C11.73 15.49 14.5 11.87 14.5 8V4L8 1zm0 1.62L13 5.1v2.9c0 3.22-2.26 6.19-5 6.94C5.26 14.19 3 11.22 3 8V5.1l5-2.48z"/></svg>
-          Admin
+        <button class="nav-admin-link" data-group="admin" data-tab="pipeline" title="Pipeline Status">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a1.5 1.5 0 00-.5 2.915V5.5A1.5 1.5 0 006 7h-.085A1.5 1.5 0 104 9.915V11.5A1.5 1.5 0 005.5 13h5a1.5 1.5 0 001.5-1.5V9.915A1.5 1.5 0 1010.085 7H10a1.5 1.5 0 00-1.5-1.5V3.915A1.5 1.5 0 008 1z"/></svg>
         </button>
       </div>
       <div class="nav-secondary">
@@ -1441,19 +1592,21 @@
           <button class="nav-sub-btn" data-tab="visibility">Visibility</button>
           <button class="nav-sub-btn" data-tab="competitive">Competitive</button>
           <button class="nav-sub-btn" data-tab="alerts">What Changed</button>
+        </div>
+        <div class="nav-sub-group" data-group="analyze">
           <button class="nav-sub-btn" data-tab="categories">Categories</button>
           <button class="nav-sub-btn" data-tab="queries">Queries</button>
         </div>
         <div class="nav-sub-group" data-group="act">
           <button class="nav-sub-btn" data-tab="recommendations">Recommendations</button>
           <button class="nav-sub-btn" data-tab="contentstrategy">Content Strategy</button>
-          <button class="nav-sub-btn" data-tab="simulator">AI Simulator</button>
-          <button class="nav-sub-btn" data-tab="storemap">Store Map</button>
-        </div>
-        <div class="nav-sub-group" data-group="insights">
-          <button class="nav-sub-btn" data-tab="cpgbrands">CPG Brands</button>
-          <button class="nav-sub-btn" data-tab="expansion">Market Expansion</button>
           <button class="nav-sub-btn" data-tab="roi">ROI & Revenue</button>
+        </div>
+        <div class="nav-sub-group" data-group="roadmap">
+          <button class="nav-sub-btn roadmap-sub" data-tab="cpgbrands"><span class="phase-badge">Phase 2</span> CPG Brands</button>
+          <button class="nav-sub-btn roadmap-sub" data-tab="expansion"><span class="phase-badge">Phase 2</span> Market Expansion</button>
+          <button class="nav-sub-btn roadmap-sub" data-tab="simulator"><span class="phase-badge">Phase 2</span> AI Simulator</button>
+          <button class="nav-sub-btn roadmap-sub" data-tab="storemap"><span class="phase-badge">Phase 2</span> Store Map</button>
         </div>
         <div class="nav-sub-group" data-group="admin">
           <button class="nav-sub-btn" data-tab="pipeline">Pipeline Status</button>
@@ -1464,28 +1617,29 @@
     <!-- TAB 0: OVERVIEW -->
     <div id="overview" class="tab-content active">
 
-      <!-- What's New Card -->
+      <!-- Guided Narrative Card -->
       <div class="whats-new-card" id="whats-new-card">
         <h4>
-          <span style="font-size:18px;">&#9889;</span> Featured Sections
+          <span style="font-size:18px;">&#9889;</span> The Claravoy Story
           <button class="whats-new-dismiss" onclick="document.getElementById('whats-new-card').style.display='none'" title="Dismiss">&times;</button>
         </h4>
+        <p style="font-size:13px; color:#7A7570; margin: 4px 0 12px 0;">Follow the narrative from monitoring to action, or explore on your own.</p>
         <div class="feature-list">
+          <div class="feature-item" onclick="startTour()">
+            <div class="feat-icon" style="background:#1A2740; color:#ffffff;">&#9654;</div>
+            <div><strong>Take the Guided Tour</strong><br><span style="color:#7A7570; font-size:12px;">Walk through 6 key views that tell the full story</span></div>
+          </div>
           <div class="feature-item" onclick="activateGroup('monitor'); switchToTab('visibility')">
             <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#128200;</div>
-            <div><strong>Visibility Dashboard</strong><br><span style="color:#7A7570; font-size:12px;">Score trends, drivers, platform breakdown — all in one view</span></div>
+            <div><strong>Visibility Dashboard</strong><br><span style="color:#7A7570; font-size:12px;">Where does Hy-Vee stand in AI search?</span></div>
           </div>
-          <div class="feature-item" onclick="activateGroup('monitor'); switchToTab('categories')">
-            <div class="feat-icon" style="background:#E8F5F0; color:#2D8A6E;">&#11044;</div>
-            <div><strong>Category Intelligence</strong><br><span style="color:#7A7570; font-size:12px;">Radar breakdown with AI sentiment analysis by department</span></div>
+          <div class="feature-item" onclick="activateGroup('act'); switchToTab('recommendations')">
+            <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128161;</div>
+            <div><strong>Recommendations</strong><br><span style="color:#7A7570; font-size:12px;">What should Hy-Vee do right now?</span></div>
           </div>
-          <div class="feature-item" onclick="activateGroup('insights'); switchToTab('cpgbrands')">
-            <div class="feat-icon" style="background:#F0EBF5; color:#5B4A9E;">&#127919;</div>
-            <div><strong>CPG Brand Insights</strong><br><span style="color:#7A7570; font-size:12px;">See which brands AI platforms recommend alongside grocers</span></div>
-          </div>
-          <div class="feature-item" onclick="activateGroup('insights'); switchToTab('roi')">
-            <div class="feat-icon" style="background:#E8EAF6; color:#283593;">&#128176;</div>
-            <div><strong>ROI Attribution</strong><br><span style="color:#7A7570; font-size:12px;">Connect visibility improvements to real revenue lift</span></div>
+          <div class="feature-item" onclick="activateGroup('act'); switchToTab('roi')">
+            <div class="feat-icon" style="background:#FFF3E0; color:#E65100;">&#128176;</div>
+            <div><strong>ROI & Revenue</strong><br><span style="color:#7A7570; font-size:12px;">What is AI visibility worth in dollars?</span></div>
           </div>
         </div>
       </div>
@@ -5985,10 +6139,10 @@
 
     // ===== GROUPED NAVIGATION HANDLERS =====
     var NAV_GROUPS = {
-      monitor: ['visibility', 'competitive', 'alerts', 'categories', 'queries'],
-      act: ['recommendations', 'contentstrategy', 'simulator', 'storemap'],
-      insights: ['cpgbrands', 'expansion', 'roi'],
-      admin: ['pipeline']
+      monitor: ['visibility', 'competitive', 'alerts'],
+      analyze: ['categories', 'queries'],
+      act: ['recommendations', 'contentstrategy', 'roi'],
+      roadmap: ['cpgbrands', 'expansion', 'simulator', 'storemap']
     };
 
     function switchToTab(tabName) {
@@ -7176,6 +7330,115 @@
         });
     }
 
+    // ===== GUIDED TOUR =====
+    var TOUR_STEPS = [
+      {
+        group: 'overview', tab: 'overview',
+        title: 'The Problem',
+        desc: 'AI platforms like ChatGPT, Perplexity, and Google AI are reshaping how consumers find grocers. Claravoy monitors whether Hy-Vee shows up — and how they compare to competitors.'
+      },
+      {
+        group: 'monitor', tab: 'visibility',
+        title: 'Where Hy-Vee Stands',
+        desc: 'This is the core metric — Hy-Vee\'s AI visibility score across all platforms, with trends over time, driver analysis, and platform-by-platform breakdown.'
+      },
+      {
+        group: 'monitor', tab: 'competitive',
+        title: 'The Competitive Landscape',
+        desc: 'How does Hy-Vee compare to Walmart, Fareway, ALDI, and others? See head-to-head positioning across every AI platform.'
+      },
+      {
+        group: 'monitor', tab: 'alerts',
+        title: 'What\'s Changing',
+        desc: 'Automated alerts surface score movements, competitor shifts, and emerging threats — so the team knows what happened before they even ask.'
+      },
+      {
+        group: 'act', tab: 'recommendations',
+        title: 'What To Do About It',
+        desc: 'AI-generated recommendations prioritized by impact. Specific, actionable steps to improve Hy-Vee\'s visibility where it matters most.'
+      },
+      {
+        group: 'act', tab: 'roi',
+        title: 'The Business Case',
+        desc: 'Model the revenue impact of improving AI visibility. See monthly uplift projections and ROI on the Claravoy subscription.'
+      }
+    ];
+    var tourStep = 0;
+    var tourActive = false;
+
+    function startTour() {
+      tourStep = 0;
+      tourActive = true;
+      renderTourStep();
+      document.getElementById('tour-overlay').classList.add('active');
+    }
+
+    function endTour() {
+      tourActive = false;
+      document.getElementById('tour-overlay').classList.remove('active');
+    }
+
+    function tourNext() {
+      if (tourStep < TOUR_STEPS.length - 1) {
+        tourStep++;
+        renderTourStep();
+      } else {
+        endTour();
+      }
+    }
+
+    function tourBack() {
+      if (tourStep > 0) {
+        tourStep--;
+        renderTourStep();
+      }
+    }
+
+    function renderTourStep() {
+      var step = TOUR_STEPS[tourStep];
+      // Navigate to the tab
+      activateGroup(step.group);
+      if (step.tab === 'overview') {
+        document.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+        switchToTab('overview');
+      } else {
+        var subBtn = document.querySelector('.nav-sub-group[data-group="' + step.group + '"] .nav-sub-btn[data-tab="' + step.tab + '"]');
+        if (subBtn) {
+          var parentGroup = subBtn.closest('.nav-sub-group');
+          if (parentGroup) parentGroup.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+          subBtn.classList.add('active');
+        }
+        switchToTab(step.tab);
+      }
+      // Update overlay
+      document.getElementById('tour-step-label').textContent = 'Step ' + (tourStep + 1) + ' of ' + TOUR_STEPS.length;
+      document.getElementById('tour-title').textContent = step.title;
+      document.getElementById('tour-desc').textContent = step.desc;
+      // Update dots
+      var dotsHtml = '';
+      for (var i = 0; i < TOUR_STEPS.length; i++) {
+        var cls = i === tourStep ? 'active' : (i < tourStep ? 'completed' : '');
+        dotsHtml += '<div class="tour-dot ' + cls + '"></div>';
+      }
+      document.getElementById('tour-dots').innerHTML = dotsHtml;
+      // Update buttons
+      document.getElementById('tour-back-btn').style.display = tourStep === 0 ? 'none' : '';
+      document.getElementById('tour-next-btn').textContent = tourStep === TOUR_STEPS.length - 1 ? 'Finish' : 'Next';
+    }
+
+    // Handle admin gear button click
+    document.querySelector('.nav-admin-link').addEventListener('click', function() {
+      document.querySelectorAll('.nav-group-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      document.querySelectorAll('.nav-sub-group').forEach(function(g) { g.classList.remove('active'); });
+      var adminSub = document.querySelector('.nav-sub-group[data-group="admin"]');
+      if (adminSub) adminSub.classList.add('active');
+      document.querySelectorAll('.nav-sub-btn').forEach(function(b) { b.classList.remove('active'); });
+      var pipeBtn = document.querySelector('.nav-sub-btn[data-tab="pipeline"]');
+      if (pipeBtn) pipeBtn.classList.add('active');
+      switchToTab('pipeline');
+    });
+
     document.addEventListener('DOMContentLoaded', async function() {
       // Load all live data, then render default tab
       await loadLiveData();
@@ -7184,5 +7447,22 @@
       initOverviewCategoryRadar();
     });
   </script>
+
+  <!-- Guided Tour Overlay -->
+  <div class="tour-overlay" id="tour-overlay">
+    <div class="tour-header">
+      <span class="tour-step-label" id="tour-step-label">Step 1 of 6</span>
+      <button class="tour-close" onclick="endTour()">&times;</button>
+    </div>
+    <div class="tour-title" id="tour-title">The Problem</div>
+    <div class="tour-desc" id="tour-desc"></div>
+    <div class="tour-nav">
+      <div class="tour-dots" id="tour-dots"></div>
+      <div class="tour-btn-group">
+        <button class="tour-btn tour-btn-back" id="tour-back-btn" onclick="tourBack()">Back</button>
+        <button class="tour-btn" id="tour-next-btn" onclick="tourNext()">Next</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
